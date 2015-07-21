@@ -1,3 +1,6 @@
+# Droptableusers
+How to install on mac some issues: http://playittodeath.ru/running-theano-based-deepmind-dqn-on-mac/
+
 # Introduction 
 
 This package provides a Lasagne/Theano-based implementation of the deep
