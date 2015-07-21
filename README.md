@@ -74,6 +74,8 @@ for logging:
 nc localhost 1567 < client_fifo |tee simple_in | ./simple | tee simple_out > client_fifo
 ```
 
+for submitting use team_6,Ly2vyAs
+
 
 # Introduction 
 
