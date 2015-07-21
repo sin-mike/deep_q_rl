@@ -184,8 +184,7 @@ def launch(args, defaults, description):
         with open(nn_file, 'r') as handle:
             network = cPickle.load(handle)
             logging.info('network loaded')
-            network.discount = parameters.discount
-            # nusty bug with discount paramter, sometimes it is not saved
+            # nusty bug with discount parameter, sometimes it is not saved
             if not network.__dict__.get('discount', None):
                 network.discount = parameters.discount
 
@@ -206,7 +205,6 @@ def launch(args, defaults, description):
                                               parameters.steps_per_epoch,
                                               parameters.steps_per_test,
                                               parameters.death_ends_episode)
-
 
     experiment.run()
 
