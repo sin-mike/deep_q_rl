@@ -75,6 +75,8 @@ nc localhost 1567 < client_fifo |tee simple_in | ./simple | tee simple_out > cli
 ```
 
 for submitting use team_6,Ly2vyAs
+port 17006
+ip 93.175.18.243
 
 
 ### Continue learning from pickled state of network
