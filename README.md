@@ -1,6 +1,37 @@
 # Droptableusers
 How to install on mac some issues: http://playittodeath.ru/running-theano-based-deepmind-dqn-on-mac/
 
+## ALE hoststart
+download this shit:
+
+https://github.com/gerrich/ale_team_runner/blob/master/README.md
+
+set aledir
+```
+ALE_DIR=/Users/mike/deeppen/deep_q_rl/build/ALE
+```
+make ale visible
+```
+${ALE_DIR}/ale \
+        -game_controller fifo \
+        -run_length_encoding false \
+        -display_screen true\
+        "${DIR}/roms/${line}.bin" 2>${run_dir}/ale.err
+```
+
+then, according to original man
+```
+mkdir -p teams/team_1567
+echo "test,test12" | ./make_pfile.pl > teams/team_1567/pfile.txt
+./run_server.sh
+```
+run python script
+```
+./py_kb_test.py test test12 breakout
+```
+
+
+
 # Introduction 
 
 This package provides a Lasagne/Theano-based implementation of the deep
