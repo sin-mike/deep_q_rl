@@ -148,9 +148,11 @@ def launch(args, defaults, description):
         rom = parameters.rom
     else:
         rom = "%s.bin" % parameters.rom
-    full_rom_path = os.path.join(defaults.BASE_ROM_PATH, rom)
+    full_rom_path = os.path.abspath(os.path.join(defaults.BASE_ROM_PATH, rom))
 
     ale = ale_python_interface.ALEInterface()
+    # here to overwrite methods of ALE
+
     ale.setInt('random_seed', 123)
     ale.setBool('display_screen', parameters.display_screen)
     ale.setInt('frame_skip', parameters.frame_skip)
@@ -161,6 +163,7 @@ def launch(args, defaults, description):
     num_actions = len(ale.getMinimalActionSet())
 
     if parameters.nn_file is None:
+        logging.info('generating network from scratch')
         network = q_network.DeepQLearner(defaults.RESIZED_WIDTH,
                                          defaults.RESIZED_HEIGHT,
                                          num_actions,
@@ -176,8 +179,12 @@ def launch(args, defaults, description):
                                          parameters.update_rule,
                                          parameters.batch_accumulator)
     else:
-        handle = open(parameters.nn_file, 'r')
+        nn_file = os.path.abspath(parameters.nn_file)
+        logging.info('loading network from '+ nn_file )
+        handle = open(nn_file, 'r')
         network = cPickle.load(handle)
+        handle.close()
+        logging.info('network loaded')
 
     agent = ale_agent.NeuralAgent(network,
                                   parameters.epsilon_start,
