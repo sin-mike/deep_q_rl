@@ -4,7 +4,7 @@ How to install on mac some issues: http://playittodeath.ru/running-theano-based-
 ## ALE hoststart
 download this:
 
-https://github.com/gerrich/ale_team_runner/blob/master/README.md
+https://github.com/gerrich/ale_team_runner
 
 set aledir
 ```
