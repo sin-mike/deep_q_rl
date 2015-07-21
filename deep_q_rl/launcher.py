@@ -184,6 +184,10 @@ def launch(args, defaults, description):
         with open(nn_file, 'r') as handle:
             network = cPickle.load(handle)
             logging.info('network loaded')
+            network.discount = parameters.discount
+            # nusty bug with discount paramter, sometimes it is not saved
+            if not network.__dict__.get('discount', None):
+                network.discount = parameters.discount
 
     agent = ale_agent.NeuralAgent(network,
                                   parameters.epsilon_start,
