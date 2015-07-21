@@ -2,7 +2,7 @@
 How to install on mac some issues: http://playittodeath.ru/running-theano-based-deepmind-dqn-on-mac/
 
 ## ALE hoststart
-download this shit:
+download this:
 
 https://github.com/gerrich/ale_team_runner/blob/master/README.md
 
