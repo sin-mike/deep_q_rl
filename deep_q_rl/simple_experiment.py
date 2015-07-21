@@ -27,7 +27,12 @@ class SimpleExperiment(object):
 
         screen = self.ale.act(0)
         action = self.agent.start_episode(screen)
-        print action
+
+        for step in xrange(100):
+            print action
+            screen, episode_str = self.ale.act(action)
+            reward = int(episode_str.split(',')[0])
+            action = self.agent.step(reward, screen)
 
         # num_steps = 1
         # reward = 0

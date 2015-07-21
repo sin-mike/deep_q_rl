@@ -73,7 +73,7 @@ class PipeInterface(object):
         data = self.sl.get_line()
         (screen_str, episode_str, delme) = data.split(":", 2)
         print screen_str, episode_str
-        return screen_str
+        return screen_str, episode_str
 
     def game_over(self):
         return "is the game over ? oo"
