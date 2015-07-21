@@ -13,11 +13,6 @@ import sys
 
 class Defaults:
     # ----------------------
-    # RLGlue Parameters
-    # ----------------------
-    RLGLUE_PORT = 4096
-    
-    # ----------------------
     # Experiment Parameters
     # ----------------------
     STEPS_PER_EPOCH = 50000
@@ -51,8 +46,10 @@ class Defaults:
     NETWORK_TYPE = "nips_dnn"
     FREEZE_INTERVAL = -1
     REPLAY_START_SIZE = 100
-    IMAGE_RESIZE = 'crop'
-
+    RESIZE_METHOD = 'crop'
+    RESIZED_WIDTH = 84
+    RESIZED_HEIGHT = 84
+    DEATH_ENDS_EPISODE = 'false'
 
 if __name__ == "__main__":
     launcher.launch(sys.argv[1:], Defaults, __doc__)

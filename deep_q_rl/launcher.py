@@ -1,59 +1,18 @@
 #! /usr/bin/env python
-"""This script launches all of the processes necessary to train a
-deep Q-network on an ALE game.
+"""This script handles reading command line arguments and starting the
+training process.  It shouldn't be executed directly; it is used by
+run_nips.py or run_nature.py.
 
 """
-import subprocess
-import multiprocessing
 import os
 import argparse
 import logging
+import ale_python_interface
+import cPickle
 
-from rlglue.agent import AgentLoader
-
-def launch_rlglue_agent(parameters):
-    """Start the rlglue agent.
-
-    (This function is executed in a separate process using
-    multiprocessing.)
-    """
-    import rl_glue_ale_agent
-    agent = rl_glue_ale_agent.NeuralAgent(parameters.discount,
-                                          parameters.learning_rate,
-                                          parameters.rms_decay,
-                                          parameters.rms_epsilon,
-                                          parameters.momentum,
-                                          parameters.epsilon_start,
-                                          parameters.epsilon_min,
-                                          parameters.epsilon_decay,
-                                          parameters.phi_length,
-                                          parameters.replay_memory_size,
-                                          parameters.experiment_prefix,
-                                          parameters.nn_file,
-                                          parameters.pause,
-                                          parameters.network_type,
-                                          parameters.update_rule,
-                                          parameters.batch_accumulator,
-                                          parameters.freeze_interval,
-                                          parameters.batch_size,
-                                          parameters.replay_start_size,
-                                          parameters.update_frequency,
-                                          parameters.image_resize)
-    AgentLoader.loadAgent(agent)
-
-def launch_experiment(parameters):
-    """Start the rlglue experiment.
-
-    (This function is executed in a separate process using
-    multiprocessing.)
-    """
-    import rl_glue_ale_experiment
-    experiment = rl_glue_ale_experiment.AleExperiment(
-        parameters.epochs,
-        parameters.steps_per_epoch,
-        parameters.steps_per_test)
-    experiment.run()
-
+import ale_experiment
+import ale_agent
+import q_network
 
 def process_args(args, defaults, description):
     """
@@ -62,6 +21,7 @@ def process_args(args, defaults, description):
     args     - list of command line arguments (not including executable name)
     defaults - a name space with variables corresponding to each of
                the required default command line values.
+    description - a string to display at the top of the help message.
     """
     parser = argparse.ArgumentParser(description=description)
     parser.add_argument('-r', '--rom', dest="rom", default=defaults.ROM,
@@ -89,9 +49,6 @@ def process_args(args, defaults, description):
                         default=defaults.FRAME_SKIP, type=int,
                         help='Every how many frames to process '
                         '(default: %(default)s)')
-    parser.add_argument('--glue-port', dest="glue_port", type=int,
-                        default=defaults.RLGLUE_PORT,
-                        help='rlglue port (default: %(default)s)')
 
     parser.add_argument('--update-rule', dest="update_rule",
                         type=str, default=defaults.UPDATE_RULE,
@@ -153,13 +110,14 @@ def process_args(args, defaults, description):
                         type=int, default=defaults.REPLAY_START_SIZE,
                         help=('Number of random steps before training. ' +
                               '(default: %(default)s)'))
-    parser.add_argument('--image-resize', dest="image_resize",
-                        type=str, default=defaults.IMAGE_RESIZE,
+    parser.add_argument('--resize-method', dest="resize_method",
+                        type=str, default=defaults.RESIZE_METHOD,
                         help=('crop|scale (default: %(default)s)'))
     parser.add_argument('--nn-file', dest="nn_file", type=str, default=None,
                         help='Pickle file containing trained net.')
-    parser.add_argument('--pause', type=float, default=0,
-                        help='Amount of time to pause display while testing.')
+    parser.add_argument('--death-ends-episode', dest="death_ends_episode",
+                        type=str, default=defaults.DEATH_ENDS_EPISODE,
+                        help=('true|false (default: %(default)s)'))
 
 
     parameters = parser.parse_args(args)
@@ -167,56 +125,81 @@ def process_args(args, defaults, description):
         name = os.path.splitext(os.path.basename(parameters.rom))[0]
         parameters.experiment_prefix = name
 
+    if parameters.death_ends_episode == 'true':
+        parameters.death_ends_episode = True
+    elif parameters.death_ends_episode == 'false':
+        parameters.death_ends_episode = False
+    else:
+        raise ValueError("--death-ends-episode must be true or false")
+
     return parameters
+
 
 
 def launch(args, defaults, description):
     """
-    Start all of the processes necessary for a single training run.
+    Execute a complete training run.
     """
 
     logging.basicConfig(level=logging.INFO)
     parameters = process_args(args, defaults, description)
 
-    os.environ["RLGLUE_PORT"] = str(parameters.glue_port)
-
-    close_fds = True
-
-    # Start RLGLue--------------
-    rl_glue_process = subprocess.Popen(['rl_glue'], env=os.environ,
-                                       close_fds=close_fds)
-
-    # Start ALE-----------------
     if parameters.rom.endswith('.bin'):
         rom = parameters.rom
     else:
         rom = "%s.bin" % parameters.rom
     full_rom_path = os.path.join(defaults.BASE_ROM_PATH, rom)
 
-    command = ['ale', '-game_controller', 'rlglue', '-send_rgb', 'true',
-               '-restricted_action_set', 'true', '-frame_skip',
-               str(parameters.frame_skip)]
-    if not parameters.merge_frames:
-        command.extend(['-disable_color_averaging', 'true'])
-    if parameters.display_screen:
-        command.extend(['-display_screen', 'true'])
-    command.append(full_rom_path)
-    ale_process = subprocess.Popen(command, env=os.environ, close_fds=close_fds)
+    ale = ale_python_interface.ALEInterface()
+    ale.setInt('random_seed', 123)
+    ale.setBool('display_screen', parameters.display_screen)
+    ale.setInt('frame_skip', parameters.frame_skip)
+    ale.setBool('color_averaging', parameters.merge_frames)
 
-    # Start ALE Experiment---------------
-    experminent_process = multiprocessing.Process(target=launch_experiment,
-                                                  args=(parameters,))
-    experminent_process.start()
+    ale.loadROM(full_rom_path)
 
-    # Start ALE Agent--------------
-    agent_process = multiprocessing.Process(target=launch_rlglue_agent,
-                                            args=(parameters,))
-    agent_process.start()
+    num_actions = len(ale.getMinimalActionSet())
 
-    rl_glue_process.wait()
-    ale_process.wait()
-    experminent_process.join()
-    agent_process.join()
+    if parameters.nn_file is None:
+        network = q_network.DeepQLearner(defaults.RESIZED_WIDTH,
+                                         defaults.RESIZED_HEIGHT,
+                                         num_actions,
+                                         parameters.phi_length,
+                                         parameters.discount,
+                                         parameters.learning_rate,
+                                         parameters.rms_decay,
+                                         parameters.rms_epsilon,
+                                         parameters.momentum,
+                                         parameters.freeze_interval,
+                                         parameters.batch_size,
+                                         parameters.network_type,
+                                         parameters.update_rule,
+                                         parameters.batch_accumulator)
+    else:
+        handle = open(parameters.nn_file, 'r')
+        network = cPickle.load(handle)
+
+    agent = ale_agent.NeuralAgent(network,
+                                  parameters.epsilon_start,
+                                  parameters.epsilon_min,
+                                  parameters.epsilon_decay,
+                                  parameters.replay_memory_size,
+                                  parameters.experiment_prefix,
+                                  parameters.replay_start_size,
+                                  parameters.update_frequency)
+
+    experiment = ale_experiment.ALEExperiment(ale, agent,
+                                              defaults.RESIZED_WIDTH,
+                                              defaults.RESIZED_HEIGHT,
+                                              parameters.resize_method,
+                                              parameters.epochs,
+                                              parameters.steps_per_epoch,
+                                              parameters.steps_per_test,
+                                              parameters.death_ends_episode)
+
+
+    experiment.run()
+
 
 
 if __name__ == '__main__':
