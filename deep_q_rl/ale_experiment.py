@@ -25,7 +25,7 @@ class ALEExperiment(object):
         self.test_length = test_length
         self.death_ends_episode = death_ends_episode
         # self.min_action_set = ale.getMinimalActionSet()
-        self.min_action_set = np.arange(18)
+        self.min_action_set = np.arange(18, dtype='int32')
         self.resized_width = resized_width
         self.resized_height = resized_height
         self.resize_method = resize_method
