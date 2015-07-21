@@ -4,13 +4,13 @@ How to install on mac some issues: http://playittodeath.ru/running-theano-based-
 ## ALE hoststart
 download this:
 
-https://github.com/gerrich/ale_team_runner/blob/master/README.md
+https://github.com/gerrich/ale_team_runner
 
-set aledir
+set aledir in ./run_server.sh
 ```
 ALE_DIR=/Users/mike/deeppen/deep_q_rl/build/ALE
 ```
-make ale visible
+make ale visible in ./run_server.sh
 ```
 ${ALE_DIR}/ale \
         -game_controller fifo \
