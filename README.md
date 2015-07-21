@@ -23,9 +23,10 @@ then, according to original man
 ```
 mkdir -p teams/team_1567
 echo "test,test12" | ./make_pfile.pl > teams/team_1567/pfile.txt
+mkfifo client_fifo
 ./run_server.sh
 ```
-run python script and play 
+For manual: run python script and play 
 ```
 ./py_kb_test.py test test12 breakout
 ```
@@ -33,6 +34,45 @@ run python script and play
 1. wasd - condtrol
 1. esc - exit
 
+For simple start: rewrite simple.cpp accordingly
+```
+#include <cstdio>
+
+int main()
+{
+  const int sz = 128*1024;
+  char s[sz];
+
+  fprintf(stdout, "test,test12,breakout\n");
+  fflush(stdout);
+  
+  fgets(s, sz, stdin);
+  fprintf(stdout, "0,0,0,1\n");
+  fflush(stdout);
+  
+  for(int i = 0; i < 1000*1000; ++i) {
+    fgets(s, sz, stdin);
+    fprintf(stdout, "12,18\n");
+    fflush(stdout);
+  }
+  return 0;
+}
+
+```
+
+then compile simple.cpp
+```
+gcc simple.cpp -o simple
+```
+and run simple
+
+```
+nc localhost 1567 < client_fifo | ./simple > client_fifo
+```
+for logging:
+```
+nc localhost 1567 < client_fifo |tee simple_in | ./simple | tee simple_out > client_fifo
+```
 
 
 # Introduction 
