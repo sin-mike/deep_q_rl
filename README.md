@@ -77,6 +77,17 @@ nc localhost 1567 < client_fifo |tee simple_in | ./simple | tee simple_out > cli
 for submitting use team_6,Ly2vyAs
 
 
+### Continue learning from pickled state of network
+
+Look at the code in launcher, params will used from initial defaults.
+But agent will start from pre-trained nn 
+```
+./run_nips.py --rom gopher --nn-file ./gopher_07-21-11-27_0p0002_0p95/network_file_8.pkl
+```
+
+
+
+
 # Introduction 
 
 This package provides a Lasagne/Theano-based implementation of the deep
