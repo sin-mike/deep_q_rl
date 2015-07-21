@@ -181,10 +181,9 @@ def launch(args, defaults, description):
     else:
         nn_file = os.path.abspath(parameters.nn_file)
         logging.info('loading network from '+ nn_file )
-        handle = open(nn_file, 'r')
-        network = cPickle.load(handle)
-        handle.close()
-        logging.info('network loaded')
+        with open(nn_file, 'r') as handle:
+            network = cPickle.load(handle)
+            logging.info('network loaded')
 
     agent = ale_agent.NeuralAgent(network,
                                   parameters.epsilon_start,
