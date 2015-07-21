@@ -25,10 +25,13 @@ mkdir -p teams/team_1567
 echo "test,test12" | ./make_pfile.pl > teams/team_1567/pfile.txt
 ./run_server.sh
 ```
-run python script
+run python script and play 
 ```
 ./py_kb_test.py test test12 breakout
 ```
+1. j - start
+1. wasd - condtrol
+1. esc - exit
 
 
 
