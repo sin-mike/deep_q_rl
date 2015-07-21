@@ -261,11 +261,13 @@ class NeuralAgent(object):
 
 
     def finish_epoch(self, epoch):
-        net_file = open(os.path.join(self.exp_dir,
-                                     '/network_file_' + str(epoch) + '.pkl'), 'w')
-        # cPickle.dump(self.network, net_file, -1)
-        cPickle.dump(self.network, net_file) # let's omit protocol for now
-        net_file.close()
+        net_file_name = os.path.join(self.exp_dir, 'network_file_' + str(epoch) + '.pkl')
+        with open(net_file_name, 'w') as net_file:
+            logging.info('dumping network file to ' + net_file_name)
+            cPickle.dump(self.network, net_file) # let's omit protocol for now
+            logging.info('network file dumped')
+
+
 
     def start_testing(self):
         self.testing = True
