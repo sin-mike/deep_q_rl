@@ -160,7 +160,7 @@ def launch(args, defaults, description):
 
     ale.loadROM(full_rom_path)
 
-    num_actions = len(ale.getMinimalActionSet())
+    num_actions = len(ale.getLegalActionSet())
 
     if parameters.nn_file is None:
         logging.info('generating network from scratch')
