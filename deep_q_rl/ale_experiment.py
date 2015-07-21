@@ -25,7 +25,6 @@ class ALEExperiment(object):
         self.test_length = test_length
         self.death_ends_episode = death_ends_episode
         # self.min_action_set = ale.getMinimalActionSet()
-        # self.min_action_set = np.arange(18, dtype='int32')
         self.min_action_set = ale.getLegalActionSet()
         self.resized_width = resized_width
         self.resized_height = resized_height
@@ -44,12 +43,16 @@ class ALEExperiment(object):
             if self.epoch_length > 0:
                 self.run_epoch(epoch, self.epoch_length)
                 self.agent.finish_epoch(epoch)
+            else:
+                logging.warning('training skipped')
 
             # then test it
             if self.test_length > 0:
                 self.agent.start_testing()
                 self.run_epoch(epoch, self.test_length, True)
                 self.agent.finish_testing(epoch)
+            else:
+                logging.warning('testing skipped')
 
     def run_epoch(self, epoch, num_steps, testing=False):
         """ Run one 'epoch' of training or testing, where an epoch is defined
