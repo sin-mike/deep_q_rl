@@ -14,6 +14,9 @@ import cv2
 CROP_OFFSET = 8
 
 
+
+
+
 class ALEExperiment(object):
     def __init__(self, ale, agent, resized_width, resized_height,
                  resize_method, num_epochs, epoch_length, test_length,
@@ -87,12 +90,12 @@ class ALEExperiment(object):
 
         """
 
-        if self.terminal_lol and not self.ale.game_over():
-            self.ale.act(0) # Take a single null action
+        if not self.terminal_lol and not self.ale.game_over(): # ale safe
+            self.ale.act(0) # Take a single null action # ale safe
         else:
-            self.ale.reset_game()
+            self.ale.reset_game() # ale safe
 
-        start_lives = self.ale.lives()
+        start_lives = self.ale.lives() # ale safe
 
         action = self.agent.start_episode(self.get_image())
         num_steps = 1
@@ -104,38 +107,11 @@ class ALEExperiment(object):
             self.terminal_lol = (self.death_ends_episode and not testing and
                                  self.ale.lives() < start_lives)
             terminal = self.ale.game_over() or self.terminal_lol
+
             num_steps += 1
 
         self.agent.end_episode(reward)
         return terminal, num_steps
 
-
     def get_image(self):
-        """ Get a screen image from ale and rescale appropriately. """
-
-        # convert to greyscale
-        self.ale.getScreenRGB(self.screenRGB)
-
-        greyscaled = cv2.cvtColor(self.screenRGB, cv2.COLOR_RGB2GRAY)
-
-        if self.resize_method == 'crop':
-            # resize keeping aspect ratio
-            resize_height = int(round(
-                float(self.height) * self.resized_width / self.width))
-
-            resized = cv2.resize(greyscaled,
-                                 (self.resized_width, resize_height),
-                                 interpolation=cv2.INTER_LINEAR)
-
-            # Crop the part we want
-            crop_y_cutoff = resize_height - CROP_OFFSET - self.resized_height
-            cropped = resized[crop_y_cutoff:
-                              crop_y_cutoff + self.resized_height, :]
-
-            return cropped
-        elif self.resize_method == 'scale':
-            return cv2.resize(greyscaled,
-                              (self.resized_width, self.resized_height),
-                              interpolation=cv2.INTER_LINEAR)
-        else:
-            raise ValueError('Unrecognized image resize method.')
+        return self.ale.get_image()

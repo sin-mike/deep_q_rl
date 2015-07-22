@@ -8,7 +8,7 @@ import numpy as np
 import os
 import sys
 import socket
-
+import logging
 import re
 import codecs
 import cv2
@@ -33,7 +33,7 @@ class SockLines(object):
         return out
 
 
-class PipeInterface(object):
+class ALEInterface(object):
     def __init__(self,
                  host='localhost',
                  port=1567,
@@ -45,6 +45,9 @@ class PipeInterface(object):
         self.resized_width = 84
         self.resized_height = 84
 
+        self._isdie = False
+        self._isterminate = False
+
         HOST = host
         PORT = port
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -54,6 +57,8 @@ class PipeInterface(object):
         self.auth(login, pwd, rom)
 
         self.handshake()
+
+        self.reset_game()
 
     def auth(self, login, pwd, rom):
         # send auth
@@ -113,16 +118,42 @@ class PipeInterface(object):
     def act(self, action):
         self.s.send("%d,18\n" % action)
         data = self.sl.get_line()
-        (screen_str, episode_str, delme) = data.split(":", 2)
-        print 'We have %d scrstr' % len(screen_str), episode_str
-        return self._resized(self._unhex(screen_str)), episode_str
 
+        if len(data)<10:
+            logging.warning(data)
+            self._isdie = True
+            self._lives = self._lives - 1
+            return -1
+        else:
+            (screen_str, episode_str, delme) = data.split(":", 2)
+
+            temp = episode_str.split(',')
+            terminate = int(temp[0])
+            reward = int(temp[1])
+
+            if terminate:
+                # self._isterminate = True
+                # self._lives = self._lives - 1
+                pass
+
+            print 'We have %d scrstr %d terminate %d reward' % (len(screen_str), terminate, reward)
+            if len(screen_str) < 10:
+                print('123')
+            self._img, self._reward = self._resized(self._unhex(screen_str)), reward
+            return reward
+
+    def get_image(self):
+        return self._img
 
     def game_over(self):
-        return "is the game over ? oo"
+        return self._isdie
 
     def reset_game(self):
-        print "try to reset game"
+        self._isdie = False
+        self._isterminate = False
+        self._lives = 3
+        self.act(40)
+
 
     def getLegalActionSet(self):
         return np.arange(18, dtype='int32')
@@ -134,7 +165,8 @@ class PipeInterface(object):
         return 'get frame number'
 
     def lives(self):
-        return 'lives'
+        # todo: must read from rom start lives
+        return self._lives
 
     def getScreenDims(self):
         """returns a tuple that contains (screen_width, screen_height)

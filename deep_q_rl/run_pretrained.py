@@ -10,6 +10,8 @@ import simple_experiment
 import pipe_ale_interface
 import ale_agent
 
+import ale_experiment
+
 
 
 def launch_local_nips(args, defaults, description):
@@ -25,7 +27,7 @@ def launch_local_nips(args, defaults, description):
         rom = "%s.bin" % parameters.rom
     full_rom_path = os.path.join(defaults.BASE_ROM_PATH, rom)
 
-    ale = pipe_ale_interface.PipeInterface()
+    ale = pipe_ale_interface.ALEInterface()
 
     assert not parameters.nn_file is None, "No NN file in input"
 

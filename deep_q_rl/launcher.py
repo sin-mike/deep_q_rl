@@ -7,7 +7,8 @@ run_nips.py or run_nature.py.
 import os
 import argparse
 import logging
-import ale_python_interface
+# import ale_python_interface
+import pipe_ale_interface as ale_python_interface
 import cPickle
 
 import ale_experiment
@@ -153,12 +154,12 @@ def launch(args, defaults, description):
     ale = ale_python_interface.ALEInterface()
     # here to overwrite methods of ALE
 
-    ale.setInt('random_seed', 123)
-    ale.setBool('display_screen', parameters.display_screen)
-    ale.setInt('frame_skip', parameters.frame_skip)
-    ale.setBool('color_averaging', parameters.merge_frames)
+    # ale.setInt('random_seed', 123)
+    # ale.setBool('display_screen', parameters.display_screen)
+    # ale.setInt('frame_skip', parameters.frame_skip)
+    # ale.setBool('color_averaging', parameters.merge_frames)
 
-    ale.loadROM(full_rom_path)
+    # ale.loadROM(full_rom_path)
 
     num_actions = len(ale.getLegalActionSet())
 
@@ -184,7 +185,7 @@ def launch(args, defaults, description):
         with open(nn_file, 'r') as handle:
             network = cPickle.load(handle)
             logging.info('network loaded')
-            # nusty bug with discount parameter, sometimes it is not saved
+            # nasty bug with discount parameter, sometimes it is not saved
             if not network.__dict__.get('discount', None):
                 network.discount = parameters.discount
 
