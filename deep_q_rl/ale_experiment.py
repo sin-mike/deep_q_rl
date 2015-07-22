@@ -13,7 +13,7 @@ import cv2
 # for other games.
 CROP_OFFSET = 8
 
-import pydevd
+
 
 
 
