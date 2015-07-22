@@ -31,21 +31,29 @@ class SockLines(object):
 
 
 class PipeInterface(object):
-    def __init__(self):
-        HOST = 'localhost'
-        PORT = 1567
+    def __init__(self,
+                 host='localhost',
+                 port=1567,
+                 login='test',
+                 pwd='test12',
+                 rom='gopher'):
+
+        HOST = host
+        PORT = port
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.connect((HOST, PORT))
+        self.s = s
 
-        login = 'test'
-        pwd = 'test12'
-        rom = 'gopher'
+        self.auth(login, pwd, rom)
 
+        self.handshake()
+
+    def auth(self, login, pwd, rom):
         # send auth
-        s.send("%s,%s,%s\n"%(login, pwd, rom))
+        self.s.send("%s,%s,%s\n"%(login, pwd, rom))
 
-
-        head = s.recv(1024)
+    def handshake(self):
+        head = self.s.recv(1024)
         m = re.match(r'(\d{3})\-(\d{3})', head)
         if not m:
           sys.stderr.write("bad FIFO header: [%s]"%head)
@@ -59,13 +67,11 @@ class PipeInterface(object):
         self.height = height
         self.ssz = ssz
 
-
         print "IN:", head
-        s.send("1,0,0,1\n")
+        self.s.send("1,0,0,1\n")
 
-        sl = SockLines(s, ssz)
+        sl = SockLines(self.s, ssz)
 
-        self.s = s
         self.sl = sl
 
     def act(self, action):
@@ -82,10 +88,10 @@ class PipeInterface(object):
         print "try to reset game"
 
     def getLegalActionSet(self):
-        return 'get legal actions'
+        return np.arange(18, dtype='int32')
 
     def getMinimalActionSet(self):
-        return 'get minimal actions'
+        return self.getLegalActionSet()
 
     def getFrameNumber(self):
         return 'get frame number'
