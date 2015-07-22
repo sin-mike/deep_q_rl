@@ -24,12 +24,11 @@ class ALEExperiment(object):
         self.epoch_length = epoch_length
         self.test_length = test_length
         self.death_ends_episode = death_ends_episode
-        # self.min_action_set = ale.getMinimalActionSet()
-        self.min_action_set = ale.getLegalActionSet()
+        self.min_action_set = ale.getMinimalActionSet() # ale safe
         self.resized_width = resized_width
         self.resized_height = resized_height
         self.resize_method = resize_method
-        self.width, self.height = ale.getScreenDims()
+        self.width, self.height = ale.getScreenDims() # ale safe
         self.screenRGB = np.empty((self.height, self.width, 3), dtype=np.uint8)
         self.terminal_lol = False # Most recent episode ended on a loss of life
 
