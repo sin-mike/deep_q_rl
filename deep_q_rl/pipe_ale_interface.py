@@ -120,11 +120,13 @@ class ALEInterface(object):
         data = self.sl.get_line()
 
         if len(data)<10:
+            print data
             logging.warning(data)
             self._isdie = True
             self._lives = self._lives - 1
             return -1
         else:
+
             (screen_str, episode_str, delme) = data.split(":", 2)
 
             temp = episode_str.split(',')
@@ -155,7 +157,9 @@ class ALEInterface(object):
         self._isdie = False
         self._isterminate = False
         self._lives = 3
-        self.act(40)
+        self.act(45)
+        # self.s.send("40\n")
+        # data = self.sl.get_line()
 
 
     def getLegalActionSet(self):
