@@ -13,6 +13,8 @@ import cv2
 # for other games.
 CROP_OFFSET = 8
 
+import pydevd
+
 
 
 
@@ -34,6 +36,8 @@ class ALEExperiment(object):
         self.width, self.height = ale.getScreenDims() # ale safe
         self.screenRGB = np.empty((self.height, self.width, 3), dtype=np.uint8)
         self.terminal_lol = False # Most recent episode ended on a loss of life
+
+        # pydevd.settrace('127.0.0.1', port=12344, stdoutToServer=True, stderrToServer=True)
 
     def run(self):
         """
@@ -69,11 +73,11 @@ class ALEExperiment(object):
         """
         self.terminal_lol = False # Make sure each epoch starts with a reset.
         steps_left = num_steps
-        while steps_left > 0:
+        while steps_left > 0 and not self.terminal_lol:
             prefix = "testing" if testing else "training"
-            logging.info(prefix + " epoch: " + str(epoch) + " steps_left: " +
-                         str(steps_left))
-            _, num_steps = self.run_episode(steps_left, testing)
+            # logging.info(prefix + " epoch: " + str(epoch) + " steps_left: " +
+            #              str(steps_left))
+            self.terminal_lol, num_steps = self.run_episode(steps_left, testing)
 
             steps_left -= num_steps
 
@@ -95,8 +99,11 @@ class ALEExperiment(object):
         else:
             self.ale.reset_game() # ale safe
 
-        start_lives = self.ale.lives() # ale safe
+        if self.ale.game_over():
+            print 'GAME OVER!!'
+            self.ale.reset_game()
 
+        start_lives = self.ale.lives() # ale safe
         action = self.agent.start_episode(self.get_image())
         num_steps = 1
         reward = 0
@@ -109,6 +116,7 @@ class ALEExperiment(object):
             terminal = self.ale.game_over() or self.terminal_lol
 
             num_steps += 1
+
 
         self.agent.end_episode(reward)
         return terminal, num_steps

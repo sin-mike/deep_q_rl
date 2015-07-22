@@ -29,7 +29,7 @@ def launch_local_nips(args, defaults, description):
 
     ale = pipe_ale_interface.ALEInterface()
 
-    assert not parameters.nn_file is None, "No NN file in input"
+    assert parameters.nn_file is not None, "No NN file in input"
 
 
     # we should unpickle params for continue learning

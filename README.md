@@ -92,10 +92,9 @@ But agent will start from pre-trained nn
 
 Not working properly:
 - lag on start
-- fail with screen and reward usage in network agent
 
 ```
-python run_pretrained.py --rom gopher --nn-file nf_nips.pkl
+python run_pretrained_nature.py --rom gopher --nn-file nf_nips.pkl
 ```
 
 

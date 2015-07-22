@@ -129,16 +129,19 @@ class ALEInterface(object):
 
             temp = episode_str.split(',')
             terminate = int(temp[0])
+
             reward = int(temp[1])
 
             if terminate:
-                # self._isterminate = True
-                # self._lives = self._lives - 1
-                pass
+                print 'Terminate'
+                self._isdie = True
+                self._isterminate = True
+                self._lives = self._lives - 1
 
-            print 'We have %d scrstr %d terminate %d reward' % (len(screen_str), terminate, reward)
+
+            # print 'We have %d scrstr %d terminate %d reward' % (len(screen_str), terminate, reward)
             if len(screen_str) < 10:
-                print('123')
+                print screen_str
             self._img, self._reward = self._resized(self._unhex(screen_str)), reward
             return reward
 
