@@ -10,6 +10,9 @@ import sys
 import socket
 
 import re
+import codecs
+import cv2
+CROP_OFFSET = 8
 
 class SockLines(object):
     def __init__(self, s, ssz):
@@ -32,6 +35,14 @@ class SockLines(object):
 
 class PipeInterface(object):
     def __init__(self):
+        self.resize_method = 'crop'
+        self.resized_width = 84
+        self.resized_height = 84
+
+
+
+
+
         HOST = 'localhost'
         PORT = 1567
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -59,7 +70,6 @@ class PipeInterface(object):
         self.height = height
         self.ssz = ssz
 
-
         print "IN:", head
         s.send("1,0,0,1\n")
 
@@ -68,12 +78,42 @@ class PipeInterface(object):
         self.s = s
         self.sl = sl
 
+    def _unhex(self, data):
+        byte_str = codecs.decode(data, 'hex_codec')
+        return np.frombuffer(byte_str, dtype='uint8').reshape((self.height, self.width))
+
+    def _resized(self, data):
+        greyscaled = data
+        # cv2.imshow('afaf', data)
+        # cv2.waitKey()
+        # cv2.destroyWindow('afaf')
+        if self.resize_method == 'crop':
+        # resize keeping aspect ratio
+            resize_height = int(round(
+            float(self.height) * self.resized_width / self.width))
+
+            resized = cv2.resize(greyscaled,
+                             (self.resized_width, resize_height),
+                             interpolation=cv2.INTER_LINEAR)
+
+            # Crop the part we want
+            crop_y_cutoff = resize_height - CROP_OFFSET - self.resized_height
+            cropped = resized[crop_y_cutoff: crop_y_cutoff + self.resized_height, :]
+
+            return cropped
+        elif self.resize_method == 'scale':
+            return cv2.resize(greyscaled, (self.resized_width, self.resized_height),
+                              interpolation=cv2.INTER_LINEAR)
+        else:
+            raise ValueError('Unrecognized image resize method.')
+
     def act(self, action):
         self.s.send("%d,18\n" % action)
         data = self.sl.get_line()
         (screen_str, episode_str, delme) = data.split(":", 2)
-        print screen_str, episode_str
-        return screen_str, episode_str
+        print 'We have %d scrstr' % len(screen_str), episode_str
+        return self._resized(self._unhex(screen_str)), episode_str
+
 
     def game_over(self):
         return "is the game over ? oo"

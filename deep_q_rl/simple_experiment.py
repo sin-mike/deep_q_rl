@@ -23,15 +23,19 @@ class SimpleExperiment(object):
         Run the desired number of training epochs, a testing epoch
         is conducted after each training epoch.
         """
-        print 'JUST RUN'
 
-        screen = self.ale.act(0)
+        screen, episode_str = self.ale.act(0)
+        print len(screen)
+        print episode_str
         action = self.agent.start_episode(screen)
 
         for step in xrange(100):
             print action
             screen, episode_str = self.ale.act(action)
-            reward = int(episode_str.split(',')[0])
+            print len(screen)
+            print episode_str
+            reward = int(episode_str.split(',')[1])
+            print 'REWARD: ', reward
             action = self.agent.step(reward, screen)
 
         # num_steps = 1
