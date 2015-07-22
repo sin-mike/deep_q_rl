@@ -1,78 +1,13 @@
 # Droptableusers
 How to install on mac some issues: http://playittodeath.ru/running-theano-based-deepmind-dqn-on-mac/
 
-## ALE hoststart
+## ALE hoststart (NEW)
 download this:
+https://github.com/sin-mike/ale_team_runner
 
-https://github.com/gerrich/ale_team_runner
+but use this instead of original ale_team_runner: https://github.com/sin-mike/ale_team_runner
 
-set aledir in ./run_server.sh
-```
-ALE_DIR=/Users/mike/deeppen/deep_q_rl/build/ALE
-```
-make ale visible in ./run_server.sh
-```
-${ALE_DIR}/ale \
-        -game_controller fifo \
-        -run_length_encoding false \
-        -display_screen true\
-        "${DIR}/roms/${line}.bin" 2>${run_dir}/ale.err
-```
-
-then, according to original man
-```
-mkdir -p teams/team_1567
-echo "test,test12" | ./make_pfile.pl > teams/team_1567/pfile.txt
-mkfifo client_fifo
-./run_server.sh
-```
-For manual: run python script and play 
-```
-./py_kb_test.py test test12 breakout
-```
-1. j - start
-1. wasd - condtrol
-1. esc - exit
-
-For simple start: rewrite simple.cpp accordingly
-```
-#include <cstdio>
-
-int main()
-{
-  const int sz = 128*1024;
-  char s[sz];
-
-  fprintf(stdout, "test,test12,breakout\n");
-  fflush(stdout);
-  
-  fgets(s, sz, stdin);
-  fprintf(stdout, "0,0,0,1\n");
-  fflush(stdout);
-  
-  for(int i = 0; i < 1000*1000; ++i) {
-    fgets(s, sz, stdin);
-    fprintf(stdout, "12,18\n");
-    fflush(stdout);
-  }
-  return 0;
-}
-
-```
-
-then compile simple.cpp
-```
-gcc simple.cpp -o simple
-```
-and run simple
-
-```
-nc localhost 1567 < client_fifo | ./simple > client_fifo
-```
-for logging:
-```
-nc localhost 1567 < client_fifo |tee simple_in | ./simple | tee simple_out > client_fifo
-```
+and read HOW_TO_RUN.md
 
 for submitting use team_6,Ly2vyAs
 port 17006
