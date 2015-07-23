@@ -128,6 +128,10 @@ def process_args(args, defaults, description):
                         type=str, default=defaults.DEATH_ENDS_EPISODE,
                         help=('true|false (default: %(default)s)'))
 
+    parser.add_argument('--pipe-interface', dest="pipe_interface",
+                        action='store_true', default=False,
+                        help='Use Socket interface insteed of custom ale.')
+
     parameters = parser.parse_args(args)
     if parameters.experiment_prefix is None:
         name = os.path.splitext(os.path.basename(parameters.rom))[0]
