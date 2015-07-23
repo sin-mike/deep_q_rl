@@ -15,9 +15,12 @@ class Defaults:
     # ----------------------
     # Experiment Parameters
     # ----------------------
-    STEPS_PER_EPOCH = 10000 # set 0 for no training
-    EPOCHS = 200
-    STEPS_PER_TEST = 125000 # set 0 for no testing
+    # number of test frames in submitting episode is 18000!!!
+
+    STEPS_PER_EPOCH = 1000 # set 0 for no training
+
+    EPOCHS = 20
+    STEPS_PER_TEST = 1000  # set 0 for no testing
 
     # ----------------------
     # ALE Parameters
