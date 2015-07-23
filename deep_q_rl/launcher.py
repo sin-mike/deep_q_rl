@@ -180,6 +180,7 @@ def launch(args, defaults, description):
     """
     Execute a complete training run.
     """
+    experiment_dir = 'experiments'
 
     logging.basicConfig(level=logging.INFO)
     parameters = process_args(args, defaults, description)
@@ -191,14 +192,6 @@ def launch(args, defaults, description):
     full_rom_path = os.path.abspath(os.path.join(defaults.BASE_ROM_PATH, rom))
 
     ale = custom_ale_interface.CustomALEInterface(rom=parameters.rom, display_screen=False)
-    # here to overwrite methods of ALE
-
-    # ale.setInt('random_seed', 123)
-    # ale.setBool('display_screen', parameters.display_screen)
-    # ale.setInt('frame_skip', parameters.frame_skip)
-    # ale.setBool('color_averaging', parameters.merge_frames)
-
-    # ale.loadROM(full_rom_path)
 
     num_actions = len(ale.getLegalActionSet())
 
@@ -235,7 +228,8 @@ def launch(args, defaults, description):
                                   parameters.replay_memory_size,
                                   parameters.experiment_prefix,
                                   parameters.replay_start_size,
-                                  parameters.update_frequency)
+                                  parameters.update_frequency,
+                                  experiment_dir)
 
     experiment = ale_experiment.ALEExperiment(ale, agent,
                                               defaults.RESIZED_WIDTH,
