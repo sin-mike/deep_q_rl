@@ -62,24 +62,24 @@ class ALEInterface(object):
 
     def auth(self, login, pwd, rom):
         # send auth
-        self.s.send("%s,%s,%s\n"%(login, pwd, rom))
+        self.s.send("%s,%s,%s\n" % (login, pwd, rom))
 
     def handshake(self):
         head = self.s.recv(1024)
         m = re.match(r'(\d{3})\-(\d{3})', head)
         if not m:
-          sys.stderr.write("bad FIFO header: [%s]"%head)
+          sys.stderr.write("bad FIFO header: [%s]" % head)
           sys.exit(1)
 
         width = int(m.group(1))
         height = int(m.group(2))
-        ssz = width*height
+        ssz = width * height
 
         self.width = width
         self.height = height
         self.ssz = ssz
 
-        print "IN:", head
+        logging.info('handshake: ' + str(head))
         self.s.send("1,0,0,1\n")
 
         sl = SockLines(self.s, ssz)
@@ -92,9 +92,6 @@ class ALEInterface(object):
 
     def _resized(self, data):
         greyscaled = data
-        # cv2.imshow('afaf', data)
-        # cv2.waitKey()
-        # cv2.destroyWindow('afaf')
         if self.resize_method == 'crop':
         # resize keeping aspect ratio
             resize_height = int(round(
@@ -120,13 +117,11 @@ class ALEInterface(object):
         data = self.sl.get_line()
 
         if len(data)<10:
-            print data
+            if data.startswith('DIE'):
+                self._isdie = True
             logging.warning(data)
-            self._isdie = True
-            self._lives = self._lives - 1
             return -1
         else:
-
             (screen_str, episode_str, delme) = data.split(":", 2)
 
             temp = episode_str.split(',')
@@ -135,15 +130,12 @@ class ALEInterface(object):
             reward = int(temp[1])
 
             if terminate:
-                print 'Terminate'
-                self._isdie = True
+                logging.warning('terminate')
+
+                # todo: refactor this strange thing. DIE and termination may have difference
                 self._isterminate = True
-                self._lives = self._lives - 1
+                self._isdie = True
 
-
-            # print 'We have %d scrstr %d terminate %d reward' % (len(screen_str), terminate, reward)
-            if len(screen_str) < 10:
-                print screen_str
             self._img, self._reward = self._resized(self._unhex(screen_str)), reward
             return reward
 
@@ -156,7 +148,6 @@ class ALEInterface(object):
     def reset_game(self):
         self._isdie = False
         self._isterminate = False
-        self._lives = 3
         self.act(45)
         # self.s.send("40\n")
         # data = self.sl.get_line()
@@ -173,7 +164,8 @@ class ALEInterface(object):
 
     def lives(self):
         # todo: must read from rom start lives
-        return self._lives
+        logging.error('LIVES not available in FIFO')
+        return 0
 
     def getScreenDims(self):
         """returns a tuple that contains (screen_width, screen_height)
