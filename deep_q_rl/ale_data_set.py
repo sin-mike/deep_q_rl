@@ -149,7 +149,8 @@ class DataSet(object):
         # Grab random samples until we have enough
         while count < batch_size:
             index = np.random.randint(self._min_index(), self._max_index()+1)
-            logging.error('random_bitch', dict(minindex=self._min_index(), maxindex=self._max_index() + 1))
+            if index == 0:
+                logging.error('random_bitch', dict(minindex=self._min_index(), maxindex=self._max_index() + 1))
             end_index = index + self.phi_length - 1
             if self.single_episode(index, end_index):
                 states[count, ...] = self._make_phi(index)
