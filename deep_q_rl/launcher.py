@@ -191,7 +191,8 @@ def launch(args, defaults, description):
         rom = "%s.bin" % parameters.rom
     full_rom_path = os.path.abspath(os.path.join(defaults.BASE_ROM_PATH, rom))
 
-    ale = custom_ale_interface.CustomALEInterface(rom=parameters.rom, display_screen=False)
+    ale = custom_ale_interface.CustomALEInterface(rom=parameters.rom,
+                                                  display_screen=parameters.display_screen)
 
     num_actions = len(ale.getLegalActionSet())
 
