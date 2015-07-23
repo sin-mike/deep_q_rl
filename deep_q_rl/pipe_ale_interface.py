@@ -17,6 +17,7 @@ CROP_OFFSET = 8
 
 logger = logging.getLogger('pipe_ale_interface')
 
+import pydevd
 
 class SockLines(object):
     def __init__(self, s, ssz):
@@ -44,7 +45,7 @@ class PipeALEInterface(object):
                  login='test',
                  pwd='test12',
                  rom='gopher'):
-
+        # pydevd.settrace('127.0.0.1', port=12344, stdoutToServer=True, stderrToServer=True)
         self.resize_method = 'crop'
         self.resized_width = 84
         self.resized_height = 84
@@ -66,6 +67,7 @@ class PipeALEInterface(object):
         self.auth(login, pwd, rom)
 
         self.handshake()
+        logging.warning('hanshake done')
 
         self.reset_game()
 
@@ -92,8 +94,8 @@ class PipeALEInterface(object):
         self.s.send("1,0,0,1\n")
 
         sl = SockLines(self.s, ssz)
-
         self.sl = sl
+        self.sl.get_line()
 
     def _unhex(self, data):
         byte_str = codecs.decode(data, 'hex_codec')

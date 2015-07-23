@@ -14,7 +14,7 @@ import cv2
 CROP_OFFSET = 8
 
 
-
+import pydevd
 
 logger = logging.getLogger("ale_experiment")
 
@@ -40,6 +40,7 @@ class ALEExperiment(object):
         # pydevd.settrace('127.0.0.1', port=12344, stdoutToServer=True, stderrToServer=True)
 
     def run(self):
+        logging.warning('INRUN')
         """
         Run the desired number of training epochs, a testing epoch
         is conducted after each training epoch.
@@ -71,6 +72,7 @@ class ALEExperiment(object):
         testing - True if this Epoch is used for testing and not training
 
         """
+        self.terminal_lol = False
         steps_left = num_steps
         epiNumber = 0
         while steps_left > 0:
@@ -97,7 +99,17 @@ class ALEExperiment(object):
         Return: (terminal, num_steps)
 
         """
-        self.ale.reset_game() # ale safe
+        # if self.ale.game_over():
+        #     self.ale.reset_game()
+        # else:
+        #     self.ale.act(0)
+        if self.terminal_lol and not self.ale.game_over():
+            logging.warning('send 0')
+            self.ale.act(0) # Take a single null action
+        else:
+            logging.warning('send reset')
+            self.ale.reset_game()
+
 
         action = self.agent.start_episode(self.get_image())
         num_steps = 1
@@ -109,13 +121,13 @@ class ALEExperiment(object):
 
             # if reward<0:
             #     reward = reward*100
-
             total_reward = total_reward + reward
             action = self.agent.step(reward, self.get_image())
             terminal = self.ale.game_over()
             num_steps += 1
 
         self.agent.end_episode(reward)
+        self.terminal_lol = True
         return terminal, num_steps
 
     def get_image(self):

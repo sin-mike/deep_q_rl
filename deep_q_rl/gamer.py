@@ -40,8 +40,8 @@ class Game(object):
 
     def run_game(self):
         # You may change interface for fit usage
-        # ale = pipe_ale_interface.PipeALEInterface(rom=self.rom)
-        ale = custom_ale_interface.CustomALEInterface(rom=self.rom)
+        ale = pipe_ale_interface.PipeALEInterface(rom=self.rom)
+        # ale = custom_ale_interface.CustomALEInterface(rom=self.rom)
         self.agent.step_counter = 0
 
         if ale.game_over():

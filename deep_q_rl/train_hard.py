@@ -21,6 +21,8 @@ import ale_experiment
 import ale_agent
 from launcher import process_args
 
+import pydevd
+
 
 class Defaults:
     STEPS_PER_EPOCH = 11000  # set 0 for no training
@@ -57,6 +59,7 @@ class Defaults:
 
 
 def launch_train(args, defaults, description):
+    # pydevd.settrace('127.0.0.1', port=12344, stdoutToServer=True, stderrToServer=True)
     experiment_dir = 'experiments'
 
     logging.basicConfig(level=logging.INFO)
@@ -98,7 +101,7 @@ def launch_train(args, defaults, description):
 
     if parameters.pipe_interface:
         logging.info('Use pipe_interface')
-        ale = pipe_ale_interface.PipeALEInterface(rom=parameters.rom)
+        ale = pipe_ale_interface.PipeALEInterface(rom=parameters.rom, )
     else:
         logging.info('Use custom interface')
         ale = custom_ale_interface.CustomALEInterface(rom=parameters.rom,
@@ -107,27 +110,26 @@ def launch_train(args, defaults, description):
 
 
 
+    agent = ale_agent.NeuralAgent(network,
+                                  parameters.epsilon_start,
+                                  parameters.epsilon_min,
+                                  parameters.epsilon_decay,
+                                  parameters.replay_memory_size,
+                                  parameters.experiment_prefix,
+                                  parameters.replay_start_size,
+                                  parameters.update_frequency,
+                                  experiment_dir)
 
-        agent = ale_agent.NeuralAgent(network,
-                                      parameters.epsilon_start,
-                                      parameters.epsilon_min,
-                                      parameters.epsilon_decay,
-                                      parameters.replay_memory_size,
-                                      parameters.experiment_prefix,
-                                      parameters.replay_start_size,
-                                      parameters.update_frequency,
-                                      experiment_dir)
+    experiment = ale_experiment.ALEExperiment(ale, agent,
+                                              defaults.RESIZED_WIDTH,
+                                              defaults.RESIZED_HEIGHT,
+                                              parameters.resize_method,
+                                              parameters.epochs,
+                                              parameters.steps_per_epoch,
+                                              parameters.steps_per_test,
+                                              parameters.death_ends_episode)
 
-        experiment = ale_experiment.ALEExperiment(ale, agent,
-                                                  defaults.RESIZED_WIDTH,
-                                                  defaults.RESIZED_HEIGHT,
-                                                  parameters.resize_method,
-                                                  parameters.epochs,
-                                                  parameters.steps_per_epoch,
-                                                  parameters.steps_per_test,
-                                                  parameters.death_ends_episode)
-
-        experiment.run()
+    experiment.run()
 
 
 if __name__ == "__main__":
