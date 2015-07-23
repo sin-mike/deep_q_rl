@@ -19,6 +19,8 @@ import ale_data_set
 import sys
 sys.setrecursionlimit(10000)
 
+logger = logging.getLogger("ale_agent")
+
 class NeuralAgent(object):
     randGenerator = random.Random()
 

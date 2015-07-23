@@ -5,6 +5,7 @@ It allocates more memory than necessary, then shifts all of the
 data back to 0 when the samples reach the end of the allocated memory.
 """
 
+import logging
 import pyximport
 import numpy as np
 pyximport.install(setup_args={'include_dirs': np.get_include()})
@@ -12,6 +13,7 @@ import shift
 import time
 import theano
 
+logger = logging.getLogger("ale_data_set")
 floatX = theano.config.floatX
 
 class DataSet(object):

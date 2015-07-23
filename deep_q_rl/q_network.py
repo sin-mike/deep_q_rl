@@ -19,6 +19,10 @@ import theano
 import theano.tensor as T
 from updates import deepmind_rmsprop
 
+import logging
+
+logger = logging.getLogger("q_network")
+
 
 class DeepQLearner:
     """

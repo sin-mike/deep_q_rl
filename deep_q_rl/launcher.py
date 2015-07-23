@@ -17,6 +17,8 @@ import q_network
 
 import gamer
 
+logger = logging.getLogger("launcher")
+
 def process_args(args, defaults, description):
     """
     Handle the command line.
@@ -187,7 +189,7 @@ def launch(args, defaults, description):
         rom = "%s.bin" % parameters.rom
     full_rom_path = os.path.abspath(os.path.join(defaults.BASE_ROM_PATH, rom))
 
-    ale = ale_python_interface.ALEInterface(rom=parameters.rom)
+    ale = ale_python_interface.PipeALEInterface(rom=parameters.rom)
     # here to overwrite methods of ALE
 
     # ale.setInt('random_seed', 123)

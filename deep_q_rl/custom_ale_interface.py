@@ -10,9 +10,14 @@ import numpy as np
 
 import logging
 import cv2
+import os
 
 CROP_OFFSET = 8
+BASE_ROM_PATH = "../roms/"
+
 import ale_python_interface
+
+logger = logging.getLogger("custom_ale_interface")
 
 
 def nonfifo(fn):
@@ -20,14 +25,15 @@ def nonfifo(fn):
     Just a dev decorator
     """
     def wrapped(*args):
-        logging.warning('non-FIFO action ' + str(fn))
-        return fn(args)
+        logging.warning('non-FIFO action ' + str(fn) + str(args))
+        return fn(*args)
     return wrapped
 
 
 class SemiALEInterface(ale_python_interface.ALEInterface):
-    def __init__(self):
+    def __init__(self, rom):
         super(SemiALEInterface, self).__init__()
+        self.loadROM(rom)
         self.width, self.height = self.getScreenDims()
         self.resize_method = 'crop'
         self.resized_width = 84
@@ -67,7 +73,13 @@ class SemiALEInterface(ale_python_interface.ALEInterface):
 
     @nonfifo
     def loadROM(self, rom_file):
-        super(SemiALEInterface, self).loadROM(rom_file)
+
+        if rom_file.endswith('.bin'):
+            rom = rom_file
+        else:
+            rom = "%s.bin" % rom_file
+        full_rom_path = os.path.abspath(os.path.join(BASE_ROM_PATH, rom))
+        super(SemiALEInterface, self).loadROM(full_rom_path)
 
     def act(self, action):
         return super(SemiALEInterface, self).act(int(action))
@@ -123,6 +135,7 @@ class SemiALEInterface(ale_python_interface.ALEInterface):
         img = self.getScreen().reshape((self.height, self.width))
         return self._resized(img)
 
+
     @nonfifo
     def getScreenRGB(self, screen_data=None):
         """This function fills screen_data with the data
@@ -169,16 +182,18 @@ class SemiALEInterface(ale_python_interface.ALEInterface):
                 float(self.height) * self.resized_width / self.width))
 
             resized = cv2.resize(greyscaled,
-                                 (self.resized_width, self.resized_height),
+                                 (self.resized_width, resize_height),
                                  interpolation=cv2.INTER_LINEAR)
 
             # Crop the part we want
-            crop_y_cutoff = self.resized_height - CROP_OFFSET - self.resized_height
-            cropped = resized[crop_y_cutoff: crop_y_cutoff + self.resized_height, :]
+            crop_y_cutoff = resize_height - CROP_OFFSET - self.resized_height
+            cropped = resized[crop_y_cutoff:
+                              crop_y_cutoff + self.resized_height, :]
 
             return cropped
         elif self.resize_method == 'scale':
-            return cv2.resize(greyscaled, (self.resized_width, self.resized_height),
+            return cv2.resize(greyscaled,
+                              (self.resized_width, self.resized_height),
                               interpolation=cv2.INTER_LINEAR)
         else:
             raise ValueError('Unrecognized image resize method.')

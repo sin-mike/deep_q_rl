@@ -16,7 +16,7 @@ CROP_OFFSET = 8
 
 
 
-
+logger = logging.getLogger("ale_experiment")
 
 
 class ALEExperiment(object):
