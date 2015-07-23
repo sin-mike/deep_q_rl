@@ -280,18 +280,18 @@ class NeuralAgent(object):
 
     def finish_testing(self, epoch):
         self.testing = False
-        holdout_size = 3200
-
-        if self.holdout_data is None:
-            self.holdout_data = self.data_set.random_batch(holdout_size)[0]
-
-        holdout_sum = 0
-        for i in range(holdout_size):
-            holdout_sum += np.mean(
-                self.network.q_vals(self.holdout_data[i, ...]))
-
-        self._update_results_file(epoch, self.episode_counter,
-                                  holdout_sum / holdout_size)
+        # holdout_size = 3200
+        #
+        # if self.holdout_data is None:
+        #     self.holdout_data = self.data_set.random_batch(holdout_size)[0]
+        #
+        # holdout_sum = 0
+        # for i in range(holdout_size):
+        #     holdout_sum += np.mean(
+        #         self.network.q_vals(self.holdout_data[i, ...]))
+        #
+        # self._update_results_file(epoch, self.episode_counter,
+        #                           holdout_sum / holdout_size)
 
 
 if __name__ == "__main__":
