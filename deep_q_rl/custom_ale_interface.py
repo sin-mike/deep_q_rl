@@ -93,6 +93,7 @@ class CustomALEInterface(ale_python_interface.ALEInterface):
 
     def reset_game(self):
         super(CustomALEInterface, self).reset_game()
+        logging.warning('resetting game')
 
     @nonfifo
     def getLegalActionSet(self):
