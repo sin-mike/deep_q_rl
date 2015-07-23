@@ -26,7 +26,7 @@ class NeuralAgent(object):
 
     def __init__(self, q_network, epsilon_start, epsilon_min,
                  epsilon_decay, replay_memory_size, exp_pref,
-                 replay_start_size, update_frequency):
+                 replay_start_size, update_frequency, rootdir=None):
 
         self.network = q_network
         self.epsilon_start = epsilon_start
@@ -45,6 +45,8 @@ class NeuralAgent(object):
         self.exp_dir = self.exp_pref + time_str + \
                        "{}".format(self.network.lr).replace(".", "p") + "_" \
                        + "{}".format(self.network.discount).replace(".", "p")
+        if rootdir:
+            self.exp_dir = os.path.join(rootdir, self.exp_dir)
 
         try:
             os.stat(self.exp_dir)
