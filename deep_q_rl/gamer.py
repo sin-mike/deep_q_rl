@@ -39,6 +39,7 @@ class Game(object):
                 logging.error(err)
 
     def run_game(self):
+        # You may change interface for fit usage
         ale = pipe_ale_interface.PipeALEInterface(rom=self.rom)
         # ale = custom_ale_interface.SemiALEInterface(rom=self.rom)
         self.agent.step_counter = 0
@@ -71,6 +72,6 @@ class Game(object):
             del ale.sl
             ale.s.close()
 
-        # necessary because of connection refuse :) seems server does not close connection in time
-        time.sleep(1)
+            # necessary because of connection refuse :) seems server does not close connection in time
+            time.sleep(1)
 

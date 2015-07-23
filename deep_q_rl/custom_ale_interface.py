@@ -30,9 +30,12 @@ def nonfifo(fn):
     return wrapped
 
 
-class SemiALEInterface(ale_python_interface.ALEInterface):
-    def __init__(self, rom):
-        super(SemiALEInterface, self).__init__()
+class CustomALEInterface(ale_python_interface.ALEInterface):
+    def __init__(self, rom, display_screen=True):
+        super(CustomALEInterface, self).__init__()
+        # not nice, but setBool should run before loadROM
+        super(CustomALEInterface, self).setBool('display_screen', display_screen)
+
         self.loadROM(rom)
         self.width, self.height = self.getScreenDims()
         self.resize_method = 'crop'
@@ -41,35 +44,35 @@ class SemiALEInterface(ale_python_interface.ALEInterface):
 
     @nonfifo
     def getString(self, key):
-        return super(SemiALEInterface, self).getString(key)
+        return super(CustomALEInterface, self).getString(key)
 
     @nonfifo
     def getInt(self, key):
-        return super(SemiALEInterface, self).getInt(key)
+        return super(CustomALEInterface, self).getInt(key)
 
     @nonfifo
     def getBool(self, key):
-        return super(SemiALEInterface, self).getBool(key)
+        return super(CustomALEInterface, self).getBool(key)
 
     @nonfifo
     def getFloat(self, key):
-        return super(SemiALEInterface, self).getFloat(key)
+        return super(CustomALEInterface, self).getFloat(key)
 
     @nonfifo
     def setString(self, key, value):
-        super(SemiALEInterface, self).setString(key, value)
+        super(CustomALEInterface, self).setString(key, value)
 
     @nonfifo
     def setInt(self, key, value):
-        super(SemiALEInterface, self).setInt(key, value)
+        super(CustomALEInterface, self).setInt(key, value)
 
     @nonfifo
     def setBool(self, key, value):
-        super(SemiALEInterface, self).setBool(key, value)
+        super(CustomALEInterface, self).setBool(key, value)
 
     @nonfifo
     def setFloat(self, key, value):
-        super(SemiALEInterface, self).setFloat(key, value)
+        super(CustomALEInterface, self).setFloat(key, value)
 
     @nonfifo
     def loadROM(self, rom_file):
@@ -79,41 +82,41 @@ class SemiALEInterface(ale_python_interface.ALEInterface):
         else:
             rom = "%s.bin" % rom_file
         full_rom_path = os.path.abspath(os.path.join(BASE_ROM_PATH, rom))
-        super(SemiALEInterface, self).loadROM(full_rom_path)
+        super(CustomALEInterface, self).loadROM(full_rom_path)
 
     def act(self, action):
-        return super(SemiALEInterface, self).act(int(action))
+        return super(CustomALEInterface, self).act(int(action))
 
     def game_over(self):
-        return super(SemiALEInterface, self).game_over()
+        return super(CustomALEInterface, self).game_over()
 
     def reset_game(self):
-        super(SemiALEInterface, self).reset_game()
+        super(CustomALEInterface, self).reset_game()
 
     @nonfifo
     def getLegalActionSet(self):
-        return super(SemiALEInterface, self).getLegalActionSet()
+        return super(CustomALEInterface, self).getLegalActionSet()
 
     @nonfifo
     def getMinimalActionSet(self):
-        return super(SemiALEInterface, self).getMinimalActionSet()
+        return super(CustomALEInterface, self).getMinimalActionSet()
 
     @nonfifo
     def getFrameNumber(self):
-        return super(SemiALEInterface, self).getFrameNumber()
+        return super(CustomALEInterface, self).getFrameNumber()
 
     @nonfifo
     def lives(self):
-        return super(SemiALEInterface, self).lives()
+        return super(CustomALEInterface, self).lives()
 
     @nonfifo
     def getEpisodeFrameNumber(self):
-        return super(SemiALEInterface, self).getEpisodeFrameNumber()
+        return super(CustomALEInterface, self).getEpisodeFrameNumber()
 
     def getScreenDims(self):
         """returns a tuple that contains (screen_width, screen_height)
         """
-        return super(SemiALEInterface, self).getScreenDims()
+        return super(CustomALEInterface, self).getScreenDims()
 
     def getScreen(self, screen_data=None):
         """This function fills screen_data with the RAW Pixel data
@@ -123,7 +126,7 @@ class SemiALEInterface(ale_python_interface.ALEInterface):
         If it is None,  then this function will initialize it
         Note: This is the raw pixel values from the atari,  before any RGB palette transformation takes place
         """
-        return super(SemiALEInterface, self).getScreen()
+        return super(CustomALEInterface, self).getScreen()
         # if(screen_data is None):
         #     width = ale_lib.getScreenWidth(self.obj)
         #     height = ale_lib.getScreenHeight(self.obj)
@@ -143,11 +146,11 @@ class SemiALEInterface(ale_python_interface.ALEInterface):
         screen_data = np.empty((height,width,3), dtype=np.uint8)
         If it is None,  then this function will initialize it.
         """
-        return super(SemiALEInterface, self).getScreenRGB()
+        return super(CustomALEInterface, self).getScreenRGB()
 
     @nonfifo
     def getRAMSize(self):
-        return super(SemiALEInterface, self).getRAMSize()
+        return super(CustomALEInterface, self).getRAMSize()
 
     @nonfifo
     def getRAM(self, ram=None):
@@ -157,22 +160,22 @@ class SemiALEInterface(ale_python_interface.ALEInterface):
         Notice: It must be ram_size where ram_size can be retrieved via the getRAMSize function.
         If it is None,  then this function will initialize it.
         """
-        return super(SemiALEInterface, self).getRAM()
+        return super(CustomALEInterface, self).getRAM()
 
     @nonfifo
     def saveScreenPNG(self, filename):
-        return super(SemiALEInterface, self).saveScreenPNG(filename)
+        return super(CustomALEInterface, self).saveScreenPNG(filename)
 
     @nonfifo
     def saveState(self):
-        return super(SemiALEInterface, self).saveState()
+        return super(CustomALEInterface, self).saveState()
 
     @nonfifo
     def loadState(self):
-        return super(SemiALEInterface, self).loadState()
+        return super(CustomALEInterface, self).loadState()
 
     def __del__(self):
-        super(SemiALEInterface, self).__del__()
+        super(CustomALEInterface, self).__del__()
 
     def _resized(self, data):
         greyscaled = data

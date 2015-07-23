@@ -7,8 +7,11 @@ run_nips.py or run_nature.py.
 import os
 import argparse
 import logging
-# import ale_python_interface
-import pipe_ale_interface as ale_python_interface
+
+import ale_python_interface
+import pipe_ale_interface
+import custom_ale_interface
+
 import cPickle
 
 import ale_experiment
@@ -18,6 +21,7 @@ import q_network
 import gamer
 
 logger = logging.getLogger("launcher")
+
 
 def process_args(args, defaults, description):
     """
@@ -49,11 +53,11 @@ def process_args(args, defaults, description):
     parser.add_argument('--experiment-prefix', dest="experiment_prefix",
                         default=None,
                         help='Experiment name prefix '
-                        '(default is the name of the game)')
+                             '(default is the name of the game)')
     parser.add_argument('--frame-skip', dest="frame_skip",
                         default=defaults.FRAME_SKIP, type=int,
                         help='Every how many frames to process '
-                        '(default: %(default)s)')
+                             '(default: %(default)s)')
 
     parser.add_argument('--update-rule', dest="update_rule",
                         type=str, default=defaults.UPDATE_RULE,
@@ -71,9 +75,9 @@ def process_args(args, defaults, description):
     parser.add_argument('--rms-epsilon', dest="rms_epsilon",
                         type=float, default=defaults.RMS_EPSILON,
                         help='Denominator epsilson for rms_prop ' +
-                        '(default: %(default)s)')
+                             '(default: %(default)s)')
     parser.add_argument('--momentum', type=float, default=defaults.MOMENTUM,
-                        help=('Momentum term for Nesterov momentum. '+
+                        help=('Momentum term for Nesterov momentum. ' +
                               '(default: %(default)s)'))
     parser.add_argument('--discount', type=float, default=defaults.DISCOUNT,
                         help='Discount rate')
@@ -109,7 +113,7 @@ def process_args(args, defaults, description):
                               '(default: %(default)s)'))
     parser.add_argument('--update-frequency', dest="update_frequency",
                         type=int, default=defaults.UPDATE_FREQUENCY,
-                        help=('Number of actions before each SGD update. '+
+                        help=('Number of actions before each SGD update. ' +
                               '(default: %(default)s)'))
     parser.add_argument('--replay-start-size', dest="replay_start_size",
                         type=int, default=defaults.REPLAY_START_SIZE,
@@ -123,7 +127,6 @@ def process_args(args, defaults, description):
     parser.add_argument('--death-ends-episode', dest="death_ends_episode",
                         type=str, default=defaults.DEATH_ENDS_EPISODE,
                         help=('true|false (default: %(default)s)'))
-
 
     parameters = parser.parse_args(args)
     if parameters.experiment_prefix is None:
@@ -151,7 +154,7 @@ def launch_game(args, defaults, description):
     full_rom_path = os.path.abspath(os.path.join(defaults.BASE_ROM_PATH, rom))
 
     nn_file = os.path.abspath(parameters.nn_file)
-    logging.info('loading network from '+ nn_file )
+    logging.info('loading network from ' + nn_file)
     with open(nn_file, 'r') as handle:
         network = cPickle.load(handle)
         logging.info('network loaded')
@@ -173,8 +176,6 @@ def launch_game(args, defaults, description):
     game.run()
 
 
-
-
 def launch(args, defaults, description):
     """
     Execute a complete training run.
@@ -189,11 +190,11 @@ def launch(args, defaults, description):
         rom = "%s.bin" % parameters.rom
     full_rom_path = os.path.abspath(os.path.join(defaults.BASE_ROM_PATH, rom))
 
-    ale = ale_python_interface.PipeALEInterface(rom=parameters.rom)
+    ale = custom_ale_interface.CustomALEInterface(rom=parameters.rom)
     # here to overwrite methods of ALE
 
     # ale.setInt('random_seed', 123)
-    # ale.setBool('display_screen', parameters.display_screen)
+    ale.setBool('display_screen', parameters.display_screen)
     # ale.setInt('frame_skip', parameters.frame_skip)
     # ale.setBool('color_averaging', parameters.merge_frames)
 
@@ -219,7 +220,7 @@ def launch(args, defaults, description):
                                          parameters.batch_accumulator)
     else:
         nn_file = os.path.abspath(parameters.nn_file)
-        logging.info('loading network from '+ nn_file )
+        logging.info('loading network from ' + nn_file)
         with open(nn_file, 'r') as handle:
             network = cPickle.load(handle)
             logging.info('network loaded')
@@ -246,7 +247,6 @@ def launch(args, defaults, description):
                                               parameters.death_ends_episode)
 
     experiment.run()
-
 
 
 if __name__ == '__main__':
