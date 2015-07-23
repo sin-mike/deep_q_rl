@@ -190,7 +190,7 @@ def launch(args, defaults, description):
         rom = "%s.bin" % parameters.rom
     full_rom_path = os.path.abspath(os.path.join(defaults.BASE_ROM_PATH, rom))
 
-    ale = custom_ale_interface.CustomALEInterface(rom=parameters.rom)
+    ale = custom_ale_interface.CustomALEInterface(rom=parameters.rom, display_screen=False)
     # here to overwrite methods of ALE
 
     # ale.setInt('random_seed', 123)
