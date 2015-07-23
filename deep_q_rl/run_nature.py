@@ -51,7 +51,7 @@ class Defaults:
     NETWORK_TYPE = "nature_dnn"
     FREEZE_INTERVAL = 10000
     REPLAY_START_SIZE = 50000
-    RESIZE_METHOD = 'scale'
+    RESIZE_METHOD = 'crop'
     RESIZED_WIDTH = 84
     RESIZED_HEIGHT = 84
     DEATH_ENDS_EPISODE = 'true'

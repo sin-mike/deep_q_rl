@@ -31,10 +31,11 @@ def nonfifo(fn):
 
 
 class CustomALEInterface(ale_python_interface.ALEInterface):
-    def __init__(self, rom, display_screen=True):
+    def __init__(self, rom, display_screen=True, frame_skip=4):
         super(CustomALEInterface, self).__init__()
         # not nice, but setBool should run before loadROM
         super(CustomALEInterface, self).setBool('display_screen', display_screen)
+        super(CustomALEInterface, self).setInt('frame_skip', frame_skip)
 
         self.loadROM(rom)
         self.width, self.height = self.getScreenDims()
@@ -95,11 +96,13 @@ class CustomALEInterface(ale_python_interface.ALEInterface):
 
     @nonfifo
     def getLegalActionSet(self):
-        return super(CustomALEInterface, self).getLegalActionSet()
+        return range(18)
+        #return super(CustomALEInterface, self).getLegalActionSet()
 
     @nonfifo
     def getMinimalActionSet(self):
-        return super(CustomALEInterface, self).getMinimalActionSet()
+        return range(18)
+        # return super(CustomALEInterface, self).getMinimalActionSet()
 
     @nonfifo
     def getFrameNumber(self):

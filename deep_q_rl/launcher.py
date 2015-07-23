@@ -194,7 +194,7 @@ def launch(args, defaults, description):
     # here to overwrite methods of ALE
 
     # ale.setInt('random_seed', 123)
-    ale.setBool('display_screen', parameters.display_screen)
+    # ale.setBool('display_screen', parameters.display_screen)
     # ale.setInt('frame_skip', parameters.frame_skip)
     # ale.setBool('color_averaging', parameters.merge_frames)
 

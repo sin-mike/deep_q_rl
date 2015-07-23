@@ -122,7 +122,6 @@ class ALEExperiment(object):
 
             num_steps += 1
 
-
         self.agent.end_episode(reward)
         return terminal, num_steps
 
