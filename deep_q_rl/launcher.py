@@ -15,6 +15,8 @@ import ale_experiment
 import ale_agent
 import q_network
 
+import gamer
+
 def process_args(args, defaults, description):
     """
     Handle the command line.
@@ -134,6 +136,40 @@ def process_args(args, defaults, description):
         raise ValueError("--death-ends-episode must be true or false")
 
     return parameters
+
+
+def launch_game(args, defaults, description):
+    logging.basicConfig(level=logging.INFO)
+    parameters = process_args(args, defaults, description)
+
+    if parameters.rom.endswith('.bin'):
+        rom = parameters.rom
+    else:
+        rom = "%s.bin" % parameters.rom
+    full_rom_path = os.path.abspath(os.path.join(defaults.BASE_ROM_PATH, rom))
+
+    nn_file = os.path.abspath(parameters.nn_file)
+    logging.info('loading network from '+ nn_file )
+    with open(nn_file, 'r') as handle:
+        network = cPickle.load(handle)
+        logging.info('network loaded')
+        # nasty bug with discount parameter, sometimes it is not saved
+        if not network.__dict__.get('discount', None):
+            network.discount = parameters.discount
+
+    agent = ale_agent.NeuralAgent(network,
+                                  parameters.epsilon_start,
+                                  parameters.epsilon_min,
+                                  parameters.epsilon_decay,
+                                  parameters.replay_memory_size,
+                                  parameters.experiment_prefix,
+                                  parameters.replay_start_size,
+                                  parameters.update_frequency)
+
+    game = gamer.Game(agent, parameters.rom)
+
+    game.run()
+
 
 
 

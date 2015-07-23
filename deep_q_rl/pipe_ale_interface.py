@@ -51,7 +51,12 @@ class ALEInterface(object):
         HOST = host
         PORT = port
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.connect((HOST, PORT))
+        try:
+            s.connect((HOST, PORT))
+        except Exception, err:
+            print err
+            raise('SOCKET ERROR')
+
         self.s = s
 
         self.auth(login, pwd, rom)

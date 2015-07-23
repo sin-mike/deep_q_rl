@@ -55,5 +55,5 @@ class Defaults:
     DEATH_ENDS_EPISODE = 'true'
 
 if __name__ == "__main__":
-    launcher.launch(sys.argv[1:], Defaults, __doc__)
+    launcher.launch_game(sys.argv[1:], Defaults, __doc__)
 
