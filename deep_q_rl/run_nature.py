@@ -15,11 +15,12 @@ class Defaults:
     # ----------------------
     # Experiment Parameters
     # ----------------------
-    # number of test frames in submitting episode is 18000!!!
+    # number of test frames in submitting episode - 18000
+    # number of episodes in testing - 30
 
     STEPS_PER_EPOCH = 1000 # set 0 for no training
 
-    EPOCHS = 20
+    EPOCHS = 200
     STEPS_PER_TEST = 1000  # set 0 for no testing
 
     # ----------------------
@@ -57,7 +58,7 @@ class Defaults:
     RESIZE_METHOD = 'crop'
     RESIZED_WIDTH = 84
     RESIZED_HEIGHT = 84
-    DEATH_ENDS_EPISODE = 'true'
+    DEATH_ENDS_EPISODE = 'false'
 
 if __name__ == "__main__":
     launcher.launch(sys.argv[1:], Defaults, __doc__)

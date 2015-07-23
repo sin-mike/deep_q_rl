@@ -71,10 +71,9 @@ class ALEExperiment(object):
         testing - True if this Epoch is used for testing and not training
 
         """
-        self.terminal_lol = False # Make sure each epoch starts with a reset.
         steps_left = num_steps
         epiNumber = 0
-        while steps_left > 0 and not self.terminal_lol:
+        while steps_left > 0:
             epiNumber = epiNumber+1
             prefix = "testing" if testing else "training"
             logging.info(prefix +
@@ -98,21 +97,8 @@ class ALEExperiment(object):
         Return: (terminal, num_steps)
 
         """
+        self.ale.reset_game() # ale safe
 
-        if not self.terminal_lol and not self.ale.game_over(): # ale safe
-            self.ale.act(0) # Take a single null action # ale safe
-        else:
-            self.ale.reset_game() # ale safe
-
-
-        #
-        # \Delta lives is nice but danger heuristic:
-        # 1. We cannot get lives from FIFO interface
-        # 2. Some games have != 3 lives, some have 0
-        #       see dig_into_alele.ipynb
-        #
-
-        # start_lives = self.ale.lives() # ale safe
         action = self.agent.start_episode(self.get_image())
         num_steps = 1
         reward = 0
@@ -120,15 +106,13 @@ class ALEExperiment(object):
         terminal = False
         while not terminal and num_steps < max_steps:
             reward = self.ale.act(self.min_action_set[action])
+
+            # if reward<0:
+            #     reward = reward*100
+
             total_reward = total_reward + reward
             action = self.agent.step(reward, self.get_image())
-
-            # while testing loss of life will end episode, but not in learning
-            self.terminal_lol = (self.death_ends_episode and not testing)
-
-            terminal = self.ale.game_over() or self.terminal_lol
-            # terminal = self.ale.game_over()
-
+            terminal = self.ale.game_over()
             num_steps += 1
 
         self.agent.end_episode(reward)
