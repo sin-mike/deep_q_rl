@@ -43,7 +43,7 @@ class PipeALEInterface(object):
                  # port=1567,
                  # login='test',
                  # pwd='test12',
-                 host='93.175.18.234',
+                 host='52.8.225.234',
                  port=17006,
                  login='team_6',
                  pwd='Ly2vyA',
