@@ -5,6 +5,7 @@ Author: Nathan Sprague
 
 """
 import logging
+logging.basicConfig(level=logging.INFO)
 import numpy as np
 import cv2
 
