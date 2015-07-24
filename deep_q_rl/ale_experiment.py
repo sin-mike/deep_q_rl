@@ -116,6 +116,8 @@ class ALEExperiment(object):
             terminal = self.ale.game_over()
             num_steps += 1
 
+        logging.warning('total reward = '+ str(total_reward))
+
         self.agent.end_episode(reward)
         return terminal, num_steps
 
