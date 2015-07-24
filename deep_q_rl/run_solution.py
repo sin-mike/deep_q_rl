@@ -14,8 +14,8 @@ class Defaults:
     # Experiment Parameters
     # ----------------------
     STEPS_PER_EPOCH = 0
-    EPOCHS = 200
-    STEPS_PER_TEST = 125000 # set 0 for no testing
+    EPOCHS = 1
+    STEPS_PER_TEST = 540100 # set 0 for no testing
 
     # ----------------------
     # ALE Parameters
@@ -27,6 +27,7 @@ class Defaults:
     # ----------------------
     # Agent/Network parameters:
     # ----------------------
+    NN_FILE = None # starting network
     UPDATE_RULE = 'deepmind_rmsprop'
     BATCH_ACCUMULATOR = 'sum'
     LEARNING_RATE = .00025
@@ -55,5 +56,5 @@ class Defaults:
     DEATH_ENDS_EPISODE = 'true'
 
 if __name__ == "__main__":
-    launcher.launch_game(sys.argv[1:], Defaults, __doc__)
+    launcher.launch_games(sys.argv[1:], Defaults, __doc__)
 

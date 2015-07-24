@@ -8,7 +8,6 @@ import os
 import argparse
 import logging
 
-import ale_python_interface
 import pipe_ale_interface
 import custom_ale_interface
 
@@ -18,9 +17,10 @@ import ale_experiment
 import ale_agent
 import q_network
 
-import gamer
+import time
 
 logger = logging.getLogger("launcher")
+logging.basicConfig(level=logging.INFO)
 
 
 def process_args(args, defaults, description):
@@ -143,60 +143,83 @@ def process_args(args, defaults, description):
     return parameters
 
 
-def launch_game(args, defaults, description):
-    logging.basicConfig(level=logging.INFO)
-    parameters = process_args(args, defaults, description)
+def launch_games(args, defaults, description):
 
-    if parameters.rom.endswith('.bin'):
-        rom = parameters.rom
-    else:
-        rom = "%s.bin" % parameters.rom
-    full_rom_path = os.path.abspath(os.path.join(defaults.BASE_ROM_PATH, rom))
+    """
+    Sequential game starter
+    """
 
-    nn_file = os.path.abspath(parameters.nn_file)
-    logging.info('loading network from ' + nn_file)
-    with open(nn_file, 'r') as handle:
-        network = cPickle.load(handle)
-        logging.info('network loaded')
-        # nasty bug with discount parameter, sometimes it is not saved
-        if not network.__dict__.get('discount', None):
-            network.discount = parameters.discount
+    games = [('seaquest', "experiments/seaquest_07-23-20-50_0p00025_0p99_no_die/network_file_20.pkl"),
+             ('pong', None),
+             ('gopher', None),
+             ]
+    for (rom, nn_file) in games:
+        # try: # if one game stops accidentially, it doesn't affect other games
+        # create pipe ALE, which by default is headless
+        ale = pipe_ale_interface.PipeALEInterface(rom=rom)
 
-    agent = ale_agent.NeuralAgent(network,
-                                  parameters.epsilon_start,
-                                  parameters.epsilon_min,
-                                  parameters.epsilon_decay,
-                                  parameters.replay_memory_size,
-                                  parameters.experiment_prefix,
-                                  parameters.replay_start_size,
-                                  parameters.update_frequency)
+        # specify network file
+        defaults.NN_FILE = nn_file
 
-    game = gamer.Game(agent, parameters.rom)
+        # launch experiment
+        launch(args, defaults, description, ale)
 
-    game.run()
+        # some kind of miss-architecture in ale-socket place
+        del ale.sl
+        ale.s.close()
+
+        # necessary because of connection refuse :) seems server does not close connection in time
+        time.sleep(1)
+        # except Exception, e:
+        #     logging.error(str(e))
 
 
-def launch(args, defaults, description):
+
+def launch(args, defaults, description, ALE=None):
     """
     Execute a complete training run.
     """
-    experiment_dir = 'experiments'
 
-    logging.basicConfig(level=logging.INFO)
     parameters = process_args(args, defaults, description)
 
-    if parameters.rom.endswith('.bin'):
-        rom = parameters.rom
-    else:
-        rom = "%s.bin" % parameters.rom
-    full_rom_path = os.path.abspath(os.path.join(defaults.BASE_ROM_PATH, rom))
+    if ALE is None:
+        if parameters.rom.endswith('.bin'):
+            rom = parameters.rom
+        else:
+            rom = "%s.bin" % parameters.rom
+        full_rom_path = os.path.abspath(os.path.join(defaults.BASE_ROM_PATH, rom))
 
-    ale = custom_ale_interface.CustomALEInterface(rom=parameters.rom,
-                                                  display_screen=parameters.display_screen)
+        ale = custom_ale_interface.CustomALEInterface(rom=parameters.rom,
+                                                      display_screen=parameters.display_screen)
+    else:
+        ale = ALE # assume ALE already have rom inside
 
     num_actions = len(ale.getLegalActionSet())
 
-    if parameters.nn_file is None:
+    # 1. first goes run control from user
+    if parameters.nn_file is not None:
+        nn_file = os.path.abspath(parameters.nn_file)
+        logging.info('loading network from parameters: ' + nn_file)
+        with open(nn_file, 'r') as handle:
+            network = cPickle.load(handle)
+            logging.info('network loaded')
+            # nasty bug with discount parameter, sometimes it is not saved
+            if not network.__dict__.get('discount', None):
+                network.discount = parameters.discount
+
+    # 2. second goes defaults
+    elif defaults.__dict__.get('NN_FILE', None) is not None: # do we have NN_FILE in defaults class params?
+        nn_file = os.path.abspath(defaults.NN_FILE)
+        logging.info('loading network from defaults: ' + nn_file)
+        with open(nn_file, 'r') as handle:
+            network = cPickle.load(handle)
+            logging.info('network loaded')
+            # nasty bug with discount parameter, sometimes it is not saved
+            if not network.__dict__.get('discount', None):
+                network.discount = parameters.discount
+
+    # 3. training from scratch otherwise
+    else:
         logging.info('generating network from scratch')
         network = q_network.DeepQLearner(defaults.RESIZED_WIDTH,
                                          defaults.RESIZED_HEIGHT,
@@ -212,15 +235,6 @@ def launch(args, defaults, description):
                                          parameters.network_type,
                                          parameters.update_rule,
                                          parameters.batch_accumulator)
-    else:
-        nn_file = os.path.abspath(parameters.nn_file)
-        logging.info('loading network from ' + nn_file)
-        with open(nn_file, 'r') as handle:
-            network = cPickle.load(handle)
-            logging.info('network loaded')
-            # nasty bug with discount parameter, sometimes it is not saved
-            if not network.__dict__.get('discount', None):
-                network.discount = parameters.discount
 
     agent = ale_agent.NeuralAgent(network,
                                   parameters.epsilon_start,
@@ -230,7 +244,7 @@ def launch(args, defaults, description):
                                   parameters.experiment_prefix,
                                   parameters.replay_start_size,
                                   parameters.update_frequency,
-                                  experiment_dir)
+                                  'experiments') # experiment folder to store results
 
     experiment = ale_experiment.ALEExperiment(ale, agent,
                                               defaults.RESIZED_WIDTH,

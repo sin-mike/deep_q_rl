@@ -67,7 +67,7 @@ class PipeALEInterface(object):
 
         self.handshake()
 
-        self.reset_game()
+        # self.reset_game()
 
     def auth(self, login, pwd, rom):
         # send auth
@@ -142,7 +142,7 @@ class PipeALEInterface(object):
 
             if terminate:
                 logging.warning('terminate')
-
+                # self.s.send("45,18\n")
                 # todo: refactor this strange thing. DIE and termination may have difference
                 self._isterminate = True
                 self._isdie = True
@@ -159,9 +159,15 @@ class PipeALEInterface(object):
     def reset_game(self):
         self._isdie = False
         self._isterminate = False
-        self.act(45)
-        # self.s.send("40\n")
-        # data = self.sl.get_line()
+        self.s.send("45,18\n")
+        data = self.sl.get_line()
+        (screen_str, episode_str, delme) = data.split(":", 2)
+
+        temp = episode_str.split(',')
+        terminate = int(temp[0])
+
+        reward = int(temp[1])
+        self._img, self._reward = self._resized(self._unhex(screen_str)), reward
 
     def getLegalActionSet(self):
         return np.arange(18, dtype='int32')
