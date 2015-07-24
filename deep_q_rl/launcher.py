@@ -149,29 +149,30 @@ def launch_games(args, defaults, description):
     Sequential game starter
     """
 
-    games = [('seaquest', "experiments/seaquest_07-23-20-50_0p00025_0p99_no_die/network_file_20.pkl") \
+    games = [('seaquest', 'experiments/seaquest_07-24-00-35_0p00025_0p99/network_file_20.pkl')\
+             # ,('seaquest', "experiments/seaquest_07-23-20-50_0p00025_0p99_no_die/network_file_20.pkl") \
              # ,('pong', None) \
              # ,('gopher', None) \
              ]
     for (rom, nn_file) in games:
-        # try: # if one game stops accidentially, it doesn't affect other games
-        # create pipe ALE, which by default is headless
-        ale = pipe_ale_interface.PipeALEInterface(rom=rom)
+        try: # if one game stops accidentially, it doesn't affect other games
+            # create pipe ALE, which by default is headless
+            ale = pipe_ale_interface.PipeALEInterface(rom=rom)
 
-        # specify network file
-        defaults.NN_FILE = nn_file
+            # specify network file
+            defaults.NN_FILE = nn_file
 
-        # launch experiment
-        launch(args, defaults, description, ale)
+            # launch experiment
+            launch(args, defaults, description, ale)
 
-        # some kind of miss-architecture in ale-socket place
-        del ale.sl
-        ale.s.close()
+            # some kind of miss-architecture in ale-socket place
+            del ale.sl
+            ale.s.close()
 
-        # necessary because of connection refuse :) seems server does not close connection in time
-        time.sleep(1)
-        # except Exception, e:
-        #     logging.error(str(e))
+            # necessary because of connection refuse :) seems server does not close connection in time
+            time.sleep(1)
+        except Exception, e:
+            logging.error(str(e))
 
 
 

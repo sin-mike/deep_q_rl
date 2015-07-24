@@ -39,10 +39,14 @@ class SockLines(object):
 
 class PipeALEInterface(object):
     def __init__(self,
-                 host='93.175.18.243',
-                 port=17006,
-                 login='team_6',
-                 pwd='Ly2vyA',
+                 host='localhost',
+                 port=1567,
+                 login='test',
+                 pwd='test12',
+                 # host='93.175.18.243',
+                 # port=17006,
+                 # login='team_6',
+                 # pwd='Ly2vyA',
                  rom=None):
 
         if rom is None:
