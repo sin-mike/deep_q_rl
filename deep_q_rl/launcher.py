@@ -157,7 +157,7 @@ def launch_games(args, defaults, description):
              ]
 
     for (rom, folder) in games:
-        try: # if one game stops accidentially, it doesn't affect other games
+        # try: # if one game stops accidentially, it doesn't affect other games
 
             logging.info('looking for the last network_file_*** in ' + folder)
             lst = os.listdir(folder)
@@ -183,8 +183,8 @@ def launch_games(args, defaults, description):
 
             # necessary because of connection refuse :) seems server does not close connection in time
             time.sleep(1)
-        except Exception, e:
-            logging.error(str(e))
+        # except Exception, e:
+        #     logging.error(str(e))
 
 
 

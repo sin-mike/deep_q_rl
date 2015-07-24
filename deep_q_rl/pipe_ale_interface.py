@@ -66,7 +66,7 @@ class PipeALEInterface(object):
             s.connect((HOST, PORT))
         except Exception, err:
             print err
-            raise ('SOCKET ERROR')
+            raise Exception('SOCKET ERROR')
 
         self.s = s
 
