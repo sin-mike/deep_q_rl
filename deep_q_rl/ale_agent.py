@@ -174,7 +174,11 @@ class NeuralAgent(object):
         if self.testing:
             self.total_reward += reward
             action = self._choose_action(self.test_data_set, .05,
-                                         observation, np.clip(reward, -1, 1))
+                                         observation,
+                                         # np.clip(reward, -1, 1)
+                                         reward
+                                         )
+
 
         #NOT TESTING---------------------------
         else:
@@ -185,7 +189,9 @@ class NeuralAgent(object):
 
                 action = self._choose_action(self.data_set, self.epsilon,
                                              observation,
-                                             np.clip(reward, -1, 1))
+                                             # np.clip(reward, -1, 1)
+                                             reward
+                                             )
 
                 if self.step_counter % self.update_frequency == 0:
                     loss = self._do_training()
@@ -195,7 +201,9 @@ class NeuralAgent(object):
             else: # Still gathering initial random data...
                 action = self._choose_action(self.data_set, self.epsilon,
                                              observation,
-                                             np.clip(reward, -1, 1))
+                                             # np.clip(reward, -1, 1)
+                                             reward
+                                             )
 
 
         self.last_action = action
@@ -252,7 +260,8 @@ class NeuralAgent(object):
             # Store the latest sample.
             self.data_set.add_sample(self.last_img,
                                      self.last_action,
-                                     np.clip(reward, -1, 1),
+                                     # np.clip(reward, -1, 1),
+                                     reward
                                      True)
 
             logging.info("steps/second: {:.2f}".format(\
