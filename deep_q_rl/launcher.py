@@ -149,9 +149,9 @@ def launch_games(args, defaults, description):
     Sequential game starter
     """
 
-    games = [('seaquest', "experiments/seaquest_07-23-20-50_0p00025_0p99_no_die/network_file_20.pkl"),
-             ('pong', None),
-             ('gopher', None),
+    games = [('seaquest', "experiments/seaquest_07-23-20-50_0p00025_0p99_no_die/network_file_20.pkl") \
+             # ,('pong', None) \
+             # ,('gopher', None) \
              ]
     for (rom, nn_file) in games:
         # try: # if one game stops accidentially, it doesn't affect other games

@@ -39,11 +39,14 @@ class SockLines(object):
 
 class PipeALEInterface(object):
     def __init__(self,
-                 host='localhost',
-                 port=1567,
-                 login='test',
-                 pwd='test12',
-                 rom='gopher'):
+                 host='93.175.18.243',
+                 port=17006,
+                 login='team_6',
+                 pwd='Ly2vyA',
+                 rom=None):
+
+        if rom is None:
+            raise Exception('rom must be specified')
 
         self.resize_method = 'crop'
         self.resized_width = 84
