@@ -15,13 +15,13 @@ class Defaults:
     # ----------------------
     STEPS_PER_EPOCH = 0
     EPOCHS = 1
-    STEPS_PER_TEST = 540101 # set 0 for no testing
+    STEPS_PER_TEST = 100000 # set 0 for no testing
 
     # ----------------------
     # ALE Parameters
     # ----------------------
     BASE_ROM_PATH = "../roms/"
-    ROM = 'breakout.bin'
+    ROM = ''
     FRAME_SKIP = 1
 
     # ----------------------
