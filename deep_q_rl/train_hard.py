@@ -22,10 +22,11 @@ import ale_agent
 from launcher import process_args
 
 import pydevd
+pydevd.settrace('127.0.0.1', port=12344, stdoutToServer=True, stderrToServer=True)
 
 
 class Defaults:
-    STEPS_PER_EPOCH = 11000  # set 0 for no training
+    STEPS_PER_EPOCH = 1000  # set 0 for no training
     EPOCHS = 20
     STEPS_PER_TEST = 1100  # set 0 for no testing
 

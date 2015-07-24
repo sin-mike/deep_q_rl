@@ -13,7 +13,6 @@ import cv2
 # for other games.
 CROP_OFFSET = 8
 
-
 import pydevd
 
 logger = logging.getLogger("ale_experiment")
@@ -29,18 +28,17 @@ class ALEExperiment(object):
         self.epoch_length = epoch_length
         self.test_length = test_length
         self.death_ends_episode = death_ends_episode
-        self.min_action_set = ale.getMinimalActionSet() # ale safe
+        self.min_action_set = ale.getMinimalActionSet()  # ale safe
         self.resized_width = resized_width
         self.resized_height = resized_height
         self.resize_method = resize_method
-        self.width, self.height = ale.getScreenDims() # ale safe
+        self.width, self.height = ale.getScreenDims()  # ale safe
         self.screenRGB = np.empty((self.height, self.width, 3), dtype=np.uint8)
-        self.terminal_lol = False # Most recent episode ended on a loss of life
+        self.terminal_lol = False  # Most recent episode ended on a loss of life
 
         # pydevd.settrace('127.0.0.1', port=12344, stdoutToServer=True, stderrToServer=True)
 
     def run(self):
-        logging.warning('INRUN')
         """
         Run the desired number of training epochs, a testing epoch
         is conducted after each training epoch.
@@ -74,19 +72,15 @@ class ALEExperiment(object):
         """
         self.terminal_lol = False
         steps_left = num_steps
-        epiNumber = 0
+        episode_number = 0
         while steps_left > 0:
-            epiNumber = epiNumber+1
             prefix = "testing" if testing else "training"
-            logging.info(prefix +
-                         " epoch: " + str(epoch) +
-                         " episode: " + str(epiNumber) +
-                         " steps_left: " + str(steps_left) +
-                         " of " + str(num_steps))
+            logging.info("{0}: epoch {1}\tepisode {2}\t steps_left {3}/{4}"
+                         .format(prefix, epoch, episode_number, steps_left, num_steps))
             _, steps_done = self.run_episode(steps_left, testing)
+            episode_number = episode_number + 1
 
             steps_left -= steps_done
-
 
     def run_episode(self, max_steps, testing):
         """Run a single training episode.
@@ -104,12 +98,9 @@ class ALEExperiment(object):
         # else:
         #     self.ale.act(0)
         if self.terminal_lol and not self.ale.game_over():
-            logging.warning('send 0')
-            self.ale.act(0) # Take a single null action
+            self.ale.act(0)  # Take a single null action
         else:
-            logging.warning('send reset')
             self.ale.reset_game()
-
 
         action = self.agent.start_episode(self.get_image())
         num_steps = 1
@@ -119,15 +110,14 @@ class ALEExperiment(object):
         while not terminal and num_steps < max_steps:
             reward = self.ale.act(self.min_action_set[action])
 
-            # if reward<0:
-            #     reward = reward*100
             total_reward = total_reward + reward
             action = self.agent.step(reward, self.get_image())
             terminal = self.ale.game_over()
             num_steps += 1
 
-        self.agent.end_episode(reward)
         self.terminal_lol = True
+        self.agent.end_episode(reward)
+
         return terminal, num_steps
 
     def get_image(self):
