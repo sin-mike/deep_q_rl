@@ -1,5 +1,5 @@
 # project specific
-roms/
+#roms/
 build
 deep_q_rl/Gopher*
 deep_q_rl/gopher*

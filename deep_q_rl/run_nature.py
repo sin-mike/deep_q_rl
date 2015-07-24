@@ -20,7 +20,7 @@ class Defaults:
 
     STEPS_PER_EPOCH = 18000 # set 0 for no training
 
-    EPOCHS = 20
+    EPOCHS = 200
     STEPS_PER_TEST = 0  # set 0 for no testing
 
     # ----------------------
