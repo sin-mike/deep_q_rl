@@ -15,7 +15,7 @@ class Defaults:
     # ----------------------
     STEPS_PER_EPOCH = 0
     EPOCHS = 1
-    STEPS_PER_TEST = 100000 # set 0 for no testing
+    STEPS_PER_TEST = 1000 # set 0 for no testing
 
     # ----------------------
     # ALE Parameters
@@ -55,6 +55,57 @@ class Defaults:
     RESIZED_HEIGHT = 84
     DEATH_ENDS_EPISODE = 'true'
 
+
+def launch_games(args, defaults, description):
+    import os
+    import pipe_ale_interface
+    import logging
+    logging.basicConfig(level=logging.INFO)
+    import time
+
+
+    """
+    Sequential game starter
+    """
+
+    games = [
+             ('tutankham', 'experiments/tutankham_07-24-00-58_0p00025_0p99/')
+             ,('seaquest', 'experiments/seaquest_07-24-01-05_0p00025_0p99/')
+             ,('gopher', 'experiments/gopher_07-24-00-59_0p00025_0p99/')
+             ]
+
+    for (rom, folder) in games:
+        try: # if one game stops accidentially, it doesn't affect other games
+
+            logging.info('looking for the last network_file_*** in ' + folder)
+            lst = os.listdir(folder)
+            lst = [f for f in lst if f.startswith('network_file')]
+            lstcouples = [f.split('_')[-1] for f in lst]
+            numbers = [int(f.split('.')[0]) for f in lstcouples]
+            maxnum = max(numbers)
+            nn_file = os.path.join(folder,'network_file_'+str(maxnum)+'.pkl')
+            logging.info('nn_file '+nn_file)
+
+            # create pipe ALE, which by default is headless
+            ale = pipe_ale_interface.PipeALEInterface(rom=rom)
+
+            # specify network file
+            defaults.NN_FILE = nn_file
+            defaults.ROM = rom
+
+            # launch experiment
+            launcher.launch(args, defaults, description, ale)
+
+            # some kind of miss-architecture in ale-socket place
+            del ale.sl
+            ale.s.close()
+
+            # necessary because of connection refuse :) seems server does not close connection in time
+            time.sleep(1)
+        except Exception, e:
+            logging.error(str(e))
+
+
 if __name__ == "__main__":
-    launcher.launch_games(sys.argv[1:], Defaults, __doc__)
+    launch_games(sys.argv[1:], Defaults, __doc__)
 
