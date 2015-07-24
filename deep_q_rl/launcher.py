@@ -144,18 +144,30 @@ def process_args(args, defaults, description):
 
 
 def launch_games(args, defaults, description):
+    import os
 
     """
     Sequential game starter
     """
 
-    games = [('seaquest', 'experiments/seaquest_07-24-00-35_0p00025_0p99/network_file_20.pkl')\
-             # ,('seaquest', "experiments/seaquest_07-23-20-50_0p00025_0p99_no_die/network_file_20.pkl") \
-             # ,('pong', None) \
-             # ,('gopher', None) \
+    games = [
+             ('tutankham', 'experiments/tutankham_07-24-00-58_0p00025_0p99/')
+             ,('seaquest', 'experiments/seaquest_07-24-01-05_0p00025_0p99/')
+             ,('gopher', 'experiments/gopher_07-24-00-59_0p00025_0p99/')
              ]
-    for (rom, nn_file) in games:
+
+    for (rom, folder) in games:
         try: # if one game stops accidentially, it doesn't affect other games
+
+            logging.info('looking for the last network_file_*** in ' + folder)
+            lst = os.listdir(folder)
+            lst = [f for f in lst if f.startswith('network_file')]
+            lstcouples = [f.split('_')[-1] for f in lst]
+            numbers = [int(f.split('.')[0]) for f in lstcouples]
+            maxnum = max(numbers)
+            nn_file = os.path.join(folder,'network_file_'+str(maxnum)+'.pkl')
+            logging.info('nn_file '+nn_file)
+
             # create pipe ALE, which by default is headless
             ale = pipe_ale_interface.PipeALEInterface(rom=rom)
 
