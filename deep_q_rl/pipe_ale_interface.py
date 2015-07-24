@@ -43,7 +43,7 @@ class PipeALEInterface(object):
                  # port=1567,
                  # login='test',
                  # pwd='test12',
-                 host='93.175.18.243',
+                 host='93.175.18.234',
                  port=17006,
                  login='team_6',
                  pwd='Ly2vyA',
@@ -61,9 +61,13 @@ class PipeALEInterface(object):
 
         HOST = host
         PORT = port
+
+        logging.warning('connecting to socket')
+
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         try:
             s.connect((HOST, PORT))
+            logging.warning('connected!')
         except Exception, err:
             print err
             raise Exception('SOCKET ERROR')
