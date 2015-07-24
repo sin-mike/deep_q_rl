@@ -39,14 +39,14 @@ class SockLines(object):
 
 class PipeALEInterface(object):
     def __init__(self,
-                 # host='localhost',
-                 # port=1567,
-                 # login='test',
-                 # pwd='test12',
-                 host='52.8.225.234',
-                 port=17006,
-                 login='team_6',
-                 pwd='Ly2vyA',
+                 host='localhost',
+                 port=1567,
+                 login='test',
+                 pwd='test12',
+                 # host='52.8.225.234',
+                 # port=17006,
+                 # login='team_6',
+                 # pwd='Ly2vyA',
                  rom=None):
 
         if rom is None:
@@ -158,6 +158,7 @@ class PipeALEInterface(object):
                 # todo: refactor this strange thing. DIE and termination may have difference
                 self._isterminate = True
                 self._isdie = True
+                reward = -1
 
             self._img, self._reward = self._resized(self._unhex(screen_str)), reward
             return reward

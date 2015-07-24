@@ -108,8 +108,8 @@ class ALEExperiment(object):
         while not terminal and num_steps < max_steps:
             reward = self.ale.act(self.min_action_set[action])
 
-            # if reward<0:
-            #     reward = reward*100
+            if reward < 0:
+                logging.info('negative reward %d'.format(reward))
 
             total_reward = total_reward + reward
             action = self.agent.step(reward, self.get_image())
