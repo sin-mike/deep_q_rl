@@ -261,7 +261,7 @@ class NeuralAgent(object):
             self.data_set.add_sample(self.last_img,
                                      self.last_action,
                                      # np.clip(reward, -1, 1),
-                                     reward
+                                     reward,
                                      True)
 
             logging.info("steps/second: {:.2f}".format(\
