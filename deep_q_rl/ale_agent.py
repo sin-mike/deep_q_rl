@@ -271,6 +271,17 @@ class NeuralAgent(object):
             cPickle.dump(self.network, net_file) # let's omit protocol for now
             logging.info('network file dumped')
 
+        # cleaning to save space
+        numFilesToStore = 3
+        logging.info('attempting cleaning netfile')
+        try:
+
+            net_file_name = os.path.join(self.exp_dir, 'network_file_' + str(epoch-numFilesToStore) + '.pkl')
+            os.remove(net_file_name)
+            logging.info('file %s cleaned'.format(net_file_name))
+        except Exception, e:
+            logging.error('failed to clean net file')
+
 
 
     def start_testing(self):
