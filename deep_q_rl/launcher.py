@@ -150,7 +150,7 @@ def launch_games(args, defaults, description):
     Sequential game starter
     """
 
-    games = [
+    games = [('gopher', 'experiments/gopher'),
              ('tutankham', 'experiments/tutankham_07-24-00-58_0p00025_0p99/')
              ,('seaquest', 'experiments/seaquest_07-24-01-05_0p00025_0p99/')
              ,('gopher', 'experiments/gopher_07-24-00-59_0p00025_0p99/')
@@ -173,6 +173,7 @@ def launch_games(args, defaults, description):
 
             # specify network file
             defaults.NN_FILE = nn_file
+            defaults.ROM = rom
 
             # launch experiment
             launch(args, defaults, description, ale)

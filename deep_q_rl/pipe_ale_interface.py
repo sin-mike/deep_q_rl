@@ -82,6 +82,7 @@ class PipeALEInterface(object):
 
     def auth(self, login, pwd, rom):
         # send auth
+        logging.warning("%s,%s,%s\n" % (login, pwd, rom))
         self.s.send("%s,%s,%s\n" % (login, pwd, rom))
 
     def handshake(self):
